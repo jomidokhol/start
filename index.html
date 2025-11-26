@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>জমি দখল Nur</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+--danger: #e74c3c;
+--primary: #2563EB; /* Added for accent buttons */
+--win-color: #34A853; /* Google Green for Victory (Added from winning_page.html) */
+--modal-bg: rgba(0, 0, 0, 0.7); /* Modal backdrop */
+--modal-content-bg: #fff;
+}
+body {
+margin: 0;
+font-family: "Noto Sans Bengali", "Poppins", Arial, sans-serif;
+height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+color: #333;
+background: linear-gradient(135deg, #74ebd5, #9face6, #f6d365, #fda085);
+background-size: 400% 400%;
+animation: animatedBackground 15s ease infinite;
+overflow: hidden;
+}
+@keyframes animatedBackground {
+0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
+}
+.page {
+position: absolute; inset: 0; display: none; width: 100%; height: 100%;
+align-items: center; justify-content: center;
+}
+.page.active { display: flex; }
+/* Menu & Opening containers - Reusing game-container styles for consistency */
+.menu-container, .opening-container {
+max-width: 480px; width: 96%; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px);
+padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;
+position: relative; /* Added for menu-container to correctly position the utility button */
+}
+.opening-container img { width: 160px; border-radius: 50%; }
+.opening-container h2 { font-size: 28px; margin: 10px 0 5px; color: #111; }
+.opening-container .studio { color: #555; }
+.opening-container p { color: #444; }
+
+/* Transition Loader - UPDATED: Speed increased */
+.transition-loader-container {
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+width: 100%; max-width: 24rem; padding: 2rem; background: rgba(255,255,255,0.8);
+backdrop-filter: blur(4px); border-radius: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+/* Updated durations from .5s to .3s */
+@keyframes segmentFill { 0%{opacity:0;transform:rotate(0deg) scale(.8)} 100%{opacity:1;transform:rotate(var(--target-rotation)) scale(1)} }
+/* Updated duration from 4s to 2.5s */
+@keyframes progressRing { 0%{stroke-dashoffset:314} 100%{stroke-dashoffset:0} }
+.ring-container{width:120px;height:120px;position:relative; margin-bottom: 2rem;}
+.segment{position:absolute;width:100%;height:100%;border-radius:50%;clip-path:polygon(50% 50%,50% 0,100% 0);transform-origin:50% 50%;opacity:0}
+/* Recalculated delays for faster animation (~2.5s total cycle) */
+.segment-1{background-color:#EA4335;--target-rotation:51.43deg; animation:segmentFill .3s ease-out 0s forwards}
+.segment-2{background-color:#FBBC05;--target-rotation:102.86deg; animation:segmentFill .3s ease-out .35s forwards}
+.segment-3{background-color:#4285F4;--target-rotation:154.29deg; animation:segmentFill .3s ease-out .70s forwards}
+.segment-4{background-color:#34A853;--target-rotation:205.72deg; animation:segmentFill .3s ease-out 1.05s forwards}
+.segment-5{background-color:#F80080;--target-rotation:257.15deg; animation:segmentFill .3s ease-out 1.40s forwards}
+.segment-6{background-color:#00BCD4;--target-rotation:308.58deg; animation:segmentFill .3s ease-out 1.75s forwards}
+.segment-7{background-color:#FF6F00;--target-rotation:360deg; animation:segmentFill .3s ease-out 2.10s forwards}
+.ring-hole{width:60px;height:60px;background-color:white;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;z-index:10;box-shadow:inset 0 2px 4px rgba(0,0,0,.1)}
+.progress-ring{position:absolute;top:0;left:0;width:120px;height:120px;z-index:5}
+.progress-ring circle{fill:none;stroke:rgba(255,255,255,.8);stroke-width:3;stroke-dasharray:314;stroke-dashoffset:314;animation:progressRing 2.5s linear forwards} /* Speed up to 2.5s */
+@keyframes pulse{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+
+/* Game Container */
+.game-container {
+width: 880px; max-width: 96%; background: #fff; border-radius: 16px; padding: 18px;
+box-shadow: 0 12px 30px rgba(0,0,0,0.12); text-align: center; position: relative;
+}
+.game-container h1 { margin: 6px 0 12px; font-size: 26px; letter-spacing: 1px; }
+.info { margin-bottom: 8px; }
+.score-board { margin-top: 10px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.player-score { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 10px; font-weight: 700; background: #fbfdff; border: 1px solid #efefef; min-width: 140px; justify-content: center; }
+.dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.25); z-index: 40; position: absolute; transform: scale(0); transition: transform .18s cubic-bezier(.2,.9,.2,1); }
+#game-board { margin: 18px auto; background: linear-gradient(180deg, #fafafa, #f3f6f8); border-radius: 14px; position: relative; box-shadow: inset 0 4px 10px rgba(0,0,0,0.06); user-select: none; -webkit-user-select: none; }
+.dot.pop { transform: scale(1); }
+.line { position: absolute; z-index: 30; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+/* UPDATED: TOUCH ACCURACY OPTIMIZATION - HITBOX EXPANSION */
+.line::after {
+    content: '';
+    position: absolute;
+    /* Expands the clickable area by 12px on all sides without changing the visual line */
+    top: -12px; bottom: -12px; left: -12px; right: -12px;
+    z-index: 35; /* sits above the visual line but below the dot (z-40) */
+}
+
+.line-inner { width: 100%; height: 100%; border-radius: 6px; background: #e0e0e0; transition: background .18s, transform .12s, box-shadow .18s; display: block; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+.line:hover .line-inner { transform: scale(1.06); background: #d0d0d0; }
+.line.drawn .line-inner { box-shadow: 0 6px 18px rgba(0,0,0,0.12); cursor: default; }
+.box { position: absolute; border-radius: 8px; z-index: 10; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900; transform: scale(0); transition: transform .25s cubic-bezier(.2,.9,.2,1), box-shadow .18s; box-shadow: 0 8px 18px rgba(0,0,0,0.12); font-size: 24px; }
+.box.filled { transform: scale(1); }
+#winner-message { margin-top: 12px; font-size: 18px; font-weight: 700; min-height: 27px;}
+
+/* Controls/Settings */
+.settings, .controls { margin-top: 14px; display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.settings label, .controls label { font-weight: 700; }
+.settings select, .settings input { padding: 6px; border-radius: 6px; border: 1px solid #cfcfcf; margin-left: 8px; }
+.btn { padding: 10px 16px; border-radius: 8px; border: 1px solid #cfcfcf; background: #f6f8fb; cursor: pointer; font-family: inherit; font-weight: 700; transition: background .1s, transform .1s;}
+.btn:hover { transform: translateY(-1px); }
+.btn-danger { background-color: var(--danger); color: white; border-color: var(--danger);}
+.btn-primary { background-color: var(--primary); color: white; border-color: var(--primary); }
+.player-name-list { display: flex; row-gap: 20px; column-gap: 30px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+.player-name-item { display: flex; flex-direction: column; gap: 6px; align-items: center; width: 150px; }
+.player-name-item input { padding: 8px; border-radius: 8px; border: 1px solid #ddd; width: 100%; text-align: center; }
+.small-note { font-size: 13px; color: #444; margin-top: 8px; }
+
+/* Rules Modal Button & Modal Styles */
+.utility-button {
+position: absolute; top: 15px; right: 15px; background: #f0f0f0; border: 1px solid #ddd;
+border-radius: 50%; width: 40px; height: 40px; font-size: 20px; cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+transition: background .1s; font-weight: 700;
+}
+.utility-button:hover { background: #e0e0e0; }
+
+.modal-backdrop {
+position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+background-color: var(--modal-bg);
+display: none; align-items: center; justify-content: center;
+z-index: 100; opacity: 0; transition: opacity 0.3s ease-out;
+}
+.modal-active { display: flex; opacity: 1; }
+.modal-content {
+background: var(--modal-content-bg); padding: 25px; border-radius: 12px;
+max-width: 400px; width: 90%; max-height: 80vh;
+position: relative;
+transform: scale(0.8) translateY(20px); opacity: 0;
+transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.2, 1), opacity 0.3s;
+display: flex; flex-direction: column;
+}
+.modal-active .modal-content {
+transform: scale(1) translateY(0); opacity: 1;
+}
+.modal-closing .modal-content {
+transform: scale(0.8) translateY(-20px); opacity: 0;
+}
+.modal-closing {
+opacity: 0;
+}
+.modal-header {
+display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee;
+padding-bottom: 10px; margin-bottom: 15px;
+}
+.modal-header h2 { margin: 0; font-size: 22px; color: var(--primary); }
+.modal-close-btn {
+background: none; border: none; font-size: 24px; cursor: pointer; color: var(--danger);
+line-height: 1; padding: 0;
+}
+.modal-body {
+overflow-y: auto; 
+padding-right: 5px; 
+flex-grow: 1; 
+text-align: left;
+line-height: 1.6;
+color: #444;
+}
+.modal-body ul { padding-left: 20px; margin-top: 10px; }
+.modal-body li { margin-bottom: 8px; }
+
+/* --- Winning Page Styles --- */
+.winning-container {
+max-width: 600px; width: 96%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+padding: 40px; border-radius: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); text-align: center;
+position: relative;
+overflow: hidden;
+transform: scale(1);
+animation: popUp .5s ease-out;
+}
+@keyframes popUp { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+.winning-container h1 {
+font-size: 36px; margin: 0 0 10px; font-weight: 900;
+color: var(--win-color);
+text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+animation: pulse-win 1.5s infinite; 
+}
+@keyframes pulse-win {
+0% { transform: scale(1); }
+50% { transform: scale(1.02); }
+100% { transform: scale(1); }
+}
+
+.winner-name {
+font-size: 30px;
+font-weight: 900;
+margin-bottom: 25px;
+color: var(--primary);
+}
+
+.rankings-list {
+list-style: none;
+padding: 0;
+margin: 20px 0 30px;
+background: #f8f8f8;
+border-radius: 12px;
+box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+}
+.rank-item {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 12px 20px;
+border-bottom: 1px solid #eee;
+font-size: 18px;
+font-weight: 700;
+transition: background .1s;
+}
+.rank-item:first-child { border-top-left-radius: 12px; border-top-right-radius: 12px; }
+.rank-item:last-child { border-bottom: none; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
+
+.rank-item .name-score {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+.rank-item .dot {
+width: 14px;
+height: 14px;
+border-radius: 50%;
+box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+position: relative;
+transform: scale(1);
+}
+.rank-item .rank-pos {
+font-size: 20px;
+color: #777;
+width: 30px;
+text-align: left;
+}
+
+/* Confetti Animation */
+.confetti-container {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+overflow: hidden;
+z-index: 50;
+}
+.confetti {
+position: absolute;
+width: 10px;
+height: 10px;
+background-color: var(--primary);
+opacity: 0;
+animation: fall 5s infinite;
+}
+.confetti:nth-child(2n) { background-color: var(--danger); }
+.confetti:nth-child(3n) { background-color: #f1c40f; }
+.confetti:nth-child(4n) { background-color: #2ecc71; }
+.confetti:nth-child(5n) { border-radius: 50%; width: 8px; height: 8px; }
+
+@keyframes fall {
+0% { transform: translate(0, -100px) rotate(0deg); opacity: 1; }
+100% { transform: translate(var(--translateX), 100vh) rotate(var(--rotateDeg)); opacity: 0.2; }
+}
+
+/* --- TIMER AND PAUSE STYLES --- */
+#timer-container {
+width: 100%;
+height: 10px;
+background-color: #f0f0f0;
+border-radius: 5px;
+margin-bottom: 12px;
+box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+position: relative;
+display: block; /* Control via JS */
+}
+#timer-bar {
+height: 100%;
+width: 100%;
+background: linear-gradient(90deg, var(--win-color), var(--primary));
+transform-origin: left;
+transition: width 0.1s linear; 
+}
+#timer-countdown {
+position: absolute;
+right: 10px;
+top: 50%;
+transform: translateY(-50%);
+font-size: 14px;
+font-weight: 700;
+color: #333;
+z-index: 2;
+text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.7);
+}
+
+.pause-overlay {
+position: absolute;
+inset: 0;
+background: rgba(255, 255, 255, 0.1);
+backdrop-filter: blur(5px);
+-webkit-backdrop-filter: blur(5px);
+display: none;
+align-items: center;
+justify-content: center;
+z-index: 60;
+border-radius: 16px;
+opacity: 0;
+transition: opacity 0.3s ease-in-out;
+}
+.pause-overlay.active {
+display: flex;
+opacity: 1;
+}
+.pause-window {
+background: var(--modal-content-bg);
+padding: 30px;
+border-radius: 15px;
+box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+text-align: center;
+transform: scale(0.9);
+transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+.pause-overlay.active .pause-window {
+transform: scale(1);
+}
+.pause-window h2 {
+color: var(--primary);
+font-size: 26px;
+margin-top: 0;
+}
+
+/* --- NOTIFICATION STYLES --- */
+.notification-container {
+position: fixed;
+top: 20px;
+right: 20px;
+width: 320px;
+z-index: 1000;
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.notification {
+background: rgba(255, 255, 255, 0.95);
+border-radius: 12px;
+padding: 16px;
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+border: 1px solid var(--primary);
+position: relative;
+overflow: hidden;
+backdrop-filter: blur(10px);
+transform: translateX(400px);
+transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+opacity: 0;
+color: #333;
+}
+
+.notification.active {
+transform: translateX(0);
+opacity: 1;
+}
+
+.notification.hiding {
+transform: translateX(400px);
+opacity: 0;
+}
+
+.notification-header {
+display: flex;
+align-items: center;
+margin-bottom: 10px;
+}
+
+.notification-icon {
+width: 32px;
+height: 32px;
+background: linear-gradient(135deg, var(--win-color) 0%, var(--primary) 100%);
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+margin-right: 10px;
+box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+font-size: 16px;
+}
+
+.notification-title {
+font-size: 16px;
+font-weight: 600;
+color: var(--primary);
+}
+
+.notification-content {
+line-height: 1.5;
+color: #444;
+font-size: 14px;
+}
+
+.notification-time {
+margin-top: 8px;
+font-size: 11px;
+color: #888;
+text-align: right;
+}
+
+.progress-bar {
+position: absolute;
+bottom: 0;
+left: 0;
+height: 3px;
+background: linear-gradient(90deg, var(--primary) 0%, var(--win-color) 100%);
+width: 100%;
+transform-origin: left;
+}
+
+.sparks-container {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+z-index: -1;
+}
+
+.spark {
+position: absolute;
+width: 3px;
+height: 3px;
+background: var(--primary);
+border-radius: 50%;
+box-shadow: 0 0 6px 2px var(--primary);
+opacity: 0;
+}
+
+@keyframes sparkAnimation {
+0% {
+opacity: 0;
+transform: translateY(0) translateX(0);
+}
+10% {
+opacity: 1;
+}
+100% {
+opacity: 0;
+transform: translateY(-80px) translateX(var(--move-x));
+}
+}
+
+/* --- Animated Start Game Button --- */
+#start-game.btn {
+padding: 0; 
+border: none;
+background: none;
+box-shadow: none;
+transform: none; 
+}
+
+.start-game-btn-nnuu {
+position: relative;
+padding: 22px 55px; 
+font-size: 20px; 
+font-weight: 800;
+text-transform: uppercase;
+letter-spacing: 2px; 
+border: none;
+border-radius: 60px;
+cursor: pointer;
+overflow: hidden;
+transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+box-shadow:
+0 10px 25px rgba(0, 0, 0, 0.3), 
+inset 0 2px 8px rgba(255, 255, 255, 0.2); 
+z-index: 1;
+color: black; 
+background: linear-gradient(135deg, #6a11cb 0%, #2575fc 50%, #ff6b6b 100%);
+background-size: 300% 300%;
+animation: gradientShift 6s ease infinite;
+text-shadow: none; 
+}
+
+@keyframes gradientShift {
+0% {
+background-position: 0% 50%;
+box-shadow:
+0 10px 25px rgba(106, 17, 203, 0.5),
+inset 0 2px 8px rgba(255, 255, 255, 0.2);
+}
+25% {
+background-position: 50% 100%;
+box-shadow:
+0 10px 25px rgba(255, 107, 107, 0.5),
+inset 0 2px 8px rgba(255, 255, 255, 0.2);
+}
+50% {
+background-position: 100% 50%;
+box-shadow:
+0 10px 25px rgba(37, 117, 252, 0.5),
+inset 0 2px 8px rgba(255, 255, 255, 0.2);
+}
+75% {
+background-position: 50% 0%;
+box-shadow:
+0 10px 25px rgba(107, 207, 127, 0.5),
+inset 0 2px 8px rgba(255, 255, 255, 0.2);
+}
+100% {
+background-position: 0% 50%;
+box-shadow:
+0 10px 25px rgba(106, 17, 203, 0.5),
+inset 0 2px 8px rgba(255, 255, 255, 0.2);
+}
+}
+
+.start-game-btn-nnuu:hover {
+transform: translateY(-4px) scale(1.04); 
+letter-spacing: 3px;
+box-shadow:
+0 18px 40px rgba(0, 0, 0, 0.5),
+inset 0 2px 10px rgba(255, 255, 255, 0.3);
+animation-duration: 3s;
+}
+
+.start-game-btn-nnuu:active {
+transform: translateY(2px) scale(0.99);
+transition: all 0.1s ease;
+}
+
+.start-game-btn-nnuu .btn-text {
+position: relative;
+z-index: 2;
+transition: all 0.4s ease;
+}
+
+.glow-effect {
+position: absolute;
+top: -4px; 
+left: -4px; 
+right: -4px; 
+bottom: -4px; 
+background: linear-gradient(135deg,
+#6a11cb, #2575fc, #ff6b6b, #ffd93d, #6bcf7f, #4d96ff, #6a11cb);
+background-size: 400% 400%;
+border-radius: 66px;
+z-index: -1;
+animation: glowRotate 8s linear infinite;
+filter: blur(10px); 
+opacity: 0.7;
+}
+
+.ring-glow-effect {
+position: absolute;
+top: -6px;
+left: -6px;
+right: -6px;
+bottom: -6px;
+background: linear-gradient(135deg,
+#EA4335, #FBBC05, #4285F4, #34A853, #F80080, #00BCD4, #EA4335); 
+background-size: 400% 400%;
+border-radius: 50%; 
+z-index: 0; 
+animation: glowRotate 12s linear infinite; 
+filter: blur(8px);
+opacity: 0.6;
+}
+
+@keyframes glowRotate {
+0% {
+background-position: 0% 50%;
+transform: rotate(0deg);
+}
+50% {
+background-position: 100% 50%;
+transform: rotate(180deg);
+}
+100% {
+background-position: 0% 50%;
+transform: rotate(360deg);
+}
+}
+
+.shine-effect {
+position: absolute;
+top: 0;
+left: -100%;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg,
+transparent,
+rgba(255, 255, 255, 0.4),
+transparent);
+transition: left 1s ease;
+z-index: 1;
+border-radius: 60px; 
+}
+
+.start-game-btn-nnuu:hover .shine-effect {
+left: 100%;
+transition: left 0.7s ease;
+}
+
+.particles-container-nnuu {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+border-radius: 60px;
+overflow: hidden;
+pointer-events: none;
+z-index: 0;
+}
+
+.particle-nnuu {
+position: absolute;
+width: 5px; 
+height: 5px; 
+border-radius: 50%;
+opacity: 0;
+filter: blur(1px);
+}
+
+@keyframes particleFloat {
+0% {
+transform: translateY(0) translateX(0) scale(0);
+opacity: 0;
+}
+10% {
+opacity: 1;
+transform: translateY(-8px) translateX(var(--move-x)) scale(1); 
+}
+90% {
+opacity: 0.7;
+}
+100% {
+transform: translateY(-80px) translateX(calc(var(--move-x) * 2)) scale(0); 
+opacity: 0;
+}
+}
+
+/* --- LOADING SCREENS --- */
+.loading-btn-nul {
+position: relative;
+padding: 18px 45px;
+font-size: 20px; 
+font-weight: 800; 
+text-transform: uppercase;
+letter-spacing: 2px;
+border: none;
+border-radius: 50px;
+cursor: default; 
+overflow: hidden;
+transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+z-index: 1;
+color: white;
+background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+transform: scale(1); 
+animation: colorChange 8s infinite linear, pulse 2s infinite ease-in-out; 
+}
+
+.loading-btn-nul .btn-text {
+position: relative;
+z-index: 2;
+transition: all 0.4s ease;
+}
+
+@keyframes pulse {
+0% { transform: scale(1); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+50% { transform: scale(1.02); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); }
+100% { transform: scale(1); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+}
+
+@keyframes colorChange {
+0% { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); }
+25% { background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%); }
+50% { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+75% { background: linear-gradient(135deg, #f46b45 0%, #eea849 100%); }
+100% { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); }
+}
+
+.loading-btn-nul .loading-glow {
+content: '';
+position: absolute;
+top: -2px;
+left: -2px;
+right: -2px;
+bottom: -2px;
+background: linear-gradient(135deg, #6a11cb, #2575fc, #fc466b, #3f5efb, #11998e, #38ef7d, #f46b45, #eea849);
+background-size: 400%;
+border-radius: 52px;
+z-index: -1;
+animation: glow 6s linear infinite;
+filter: blur(10px);
+opacity: 1; 
+}
+
+@keyframes glow {
+0% { background-position: 0 0; }
+50% { background-position: 400% 0; }
+100% { background-position: 0 0; }
+}
+
+.particles-nul {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+border-radius: 50px;
+overflow: hidden;
+pointer-events: none;
+z-index: 0;
+}
+
+.particle-nul {
+position: absolute;
+width: 4px;
+height: 4px;
+background: white;
+border-radius: 50%;
+opacity: 0;
+}
+
+@keyframes particleFloatNul { 
+0% { transform: translateY(0) translateX(0); opacity: 0; }
+10% { opacity: 1; }
+100% { transform: translateY(-100px) translateX(var(--move-x)); opacity: 0; }
+}
+
+</style>
+</head>
+<body>
+<!-- Game Rules Modal (NEW) -->
+<div id="rules-modal" class="modal-backdrop">
+<div class="modal-content">
+<div class="modal-header">
+<h2>গেমের নিয়মাবলী</h2>
+<button class="modal-close-btn" id="modalCloseBtn">&times;</button>
+</div>
+<div class="modal-body">
+<p><strong>জমি দখল</strong> একটি ক্লাসিক ডটস অ্যান্ড বক্সেস (Dots and Boxes) গেম। এর প্রধান লক্ষ্য হলো প্রতিপক্ষের চেয়ে বেশি জায়গা (স্কোয়ার) দখল করা।</p>
+<ul>
+<li><strong>খেলার মাঠ:</strong> খেলাটি একটি গ্রিডের উপর খেলা হয়। প্রতিটি দুটি ডটের মধ্যবর্তী ফাঁকা স্থান হলো একটি সম্ভাব্য রেখা।</li>
+<li><strong>টার্ন:</strong> প্রতিটি খেলোয়াড়ের পালাক্রমে দুটি ডটের মধ্যে একটি উল্লম্ব বা অনুভূমিক রেখা আঁকতে হবে।</li>
+<li><strong>স্কোয়ার দখল:</strong> যদি কোনো খেলোয়াড় রেখা টেনে একটি ১x১ স্কোয়ারের (বক্সের) চতুর্থ বা শেষ দিকটি সম্পূর্ণ করতে পারে, তবে সেই স্কোয়ারটি তার দখলে আসে। স্কোয়ারটি খেলোয়াড়ের রঙে ভরাট হয়ে যায় এবং তার নামের প্রথম অক্ষর দিয়ে চিহ্নিত হয়।</li>
+<li><strong>অতিরিক্ত টার্ন:</strong> স্কোয়ার দখল করলে খেলোয়াড়টি একটি অতিরিক্ত টার্ন পায় এবং সে আরও একটি রেখা টানতে পারে।</li>
+<li>**সময়সীমা:** প্রতিটি মুভের জন্য নির্ধারিত সময় থাকে (মেনু থেকে সিলেক্ট করা যায়)। সময়ের মধ্যে মুভ না করলে, সিস্টেম স্বয়ংক্রিয়ভাবে একটি রেখা টেনে দেবে।</li>
+<li><strong>খেলা শেষ:</strong> যখন গ্রিডের সমস্ত স্কোয়ার পূর্ণ হয়ে যায়, তখন খেলা শেষ হয়।</li>
+<li><strong>বিজয়ী:</strong> খেলা শেষে, যে খেলোয়াড়ের দখলে সবচেয়ে বেশি স্কোয়ার থাকে, সে-ই বিজয়ী হয়। স্কোর সমান হলে, খেলাটি ড্র (Draw) হয়।</li>
+<li><strong>কম্পিউটার প্রতিপক্ষ:</strong> ১ খেলোয়াড় নির্বাচন করলে, কম্পিউটার (🤖) আপনার প্রতিপক্ষ হিসেবে খেলবে।</li>
+</ul>
+<p style="margin-top: 15px; font-style: italic;">শুভ কামনা! খেলা শুরু করুন।</p>
+</div>
+</div>
+</div>
+<!-- Opening Page -->
+<div id="page-opening" class="page active">
+<div class="opening-container">
+<img src="https://i.ibb.co.com/qv0VWgf/Adobe-Express-file.png" alt="logo">
+<h2>জমি দখল</h2>
+<p class="studio">Nur Games</p>
+<button class="loading-btn-nul" id="openingLoaderBtn" style="cursor:pointer">
+<span class="btn-text">START</span>
+<div class="loading-glow"></div>
+<div class="particles-nul" id="particlesContainerOpening"></div>
+</button>
+</div>
+</div>
+<!-- Menu Page -->
+<div id="page-menu" class="page">
+<div class="menu-container">
+<button id="menuToggleBtnMenu" class="utility-button">...</button>
+<h1>Menu</h1>
+    <div class="settings">
+        <label for="num-players">PLAYERS:</label>
+        <select id="num-players"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select>
+        <label for="grid-size">গ্রিড (10–30):</label>
+        <input id="grid-size" type="number" value="10" min="10" max="30" />
+        
+        <!-- NEW: Timer Selection -->
+        <label for="timer-select">সময়:</label>
+        <select id="timer-select">
+            <option value="60">৬০ সে.</option>
+            <option value="30">৩০ সে.</option>
+            <option value="0">বন্ধ</option>
+        </select>
+        
+        <button id="apply-players" class="btn" style="margin-left: 10px;">NAME ✏️</button>
+    </div>
+    
+    <div class="player-name-list" id="player-name-list" style="margin-top:20px"></div>
+    <div class="small-note">নোট: ১ খেলোয়াড় নির্বাচন করলে, কম্পিউটার (🤖) প্রতিপক্ষ হিসেবে যুক্ত হবে।</div>
+
+    <div class="controls" style="margin-top:20px">
+        <button id="start-game" class="btn btn-primary start-game-btn-nnuu">
+            <span class="btn-text">START GAME</span>
+            <div class="glow-effect"></div>
+            <div class="shine-effect"></div>
+            <div class="particles-container-nnuu" id="particlesContainerMenu"></div>
+        </button>
+    </div>
+</div>
+</div>
+<!-- Transition Loader -->
+<div id="page-transition-loader" class="page">
+<div class="transition-loader-container">
+<div class="ring-container">
+<div class="ring-glow-effect"></div>
+<svg class="progress-ring" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50"></circle></svg>
+<div class="segment segment-1"></div><div class="segment segment-2"></div><div class="segment segment-3"></div><div class="segment segment-4"></div><div class="segment segment-5"></div><div class="segment segment-6"></div><div class="segment segment-7"></div>
+<div class="ring-hole"></div>
+</div>
+<h1 style="font-size: 2rem; font-weight: 800; color: #374151; margin-bottom: 1rem;">
+জমি <span style="color: #2563EB;">দখল</span>
+</h1>
+<button class="loading-btn-nul" id="transitionLoaderBtn" style="margin-top: 20px;">
+<span class="btn-text">LOADING...</span>
+<div class="loading-glow"></div>
+<div class="particles-nul" id="particlesContainerTransition"></div>
+</button>
+</div>
+</div>
+<!-- Game Page (Display Only) -->
+<div id="page-game-main" class="page">
+<div class="game-container">
+<!-- PAUSE OVERLAY -->
+<div id="pause-overlay" class="pause-overlay">
+<div class="pause-window">
+<h2>Game Paused</h2>
+<button id="unpauseBtn" class="btn btn-primary" style="font-size: 20px; padding: 15px 30px;">
+▶
+</button>
+</div>
+</div>
+  <button id="menuToggleBtnGame" class="utility-button">...</button> 
+
+  <h1>জমি দখল <sup>NUR</sup></h1>
+  <div class="info">
+    <!-- TIMER CONTAINER -->
+    <div id="timer-container">
+      <div id="timer-bar"></div>
+      <span id="timer-countdown">60s</span>
+    </div>
+    <div id="player-turn"></div>
+    <div class="score-board" id="score-board"></div>
+  </div>
+  <div id="game-board"></div>
+  <div id="winner-message"></div>
+
+  <div class="controls">
+    <button id="pauseBtn" class="btn">||</button> 
+    <button id="resetBtn" class="btn btn-danger">রিসেট</button>
+    <button id="backBtn" class="btn">মেনুতে ফিরুন</button> 
+  </div>
+</div>
+</div>
+<!-- Winning Page -->
+<div id="page-winning" class="page">
+<div class="confetti-container">
+<div class="confetti" style="left: 10%; --translateX: 30px; --rotateDeg: 45deg; animation-delay: 0s;"></div>
+<div class="confetti" style="left: 20%; --translateX: -50px; --rotateDeg: 120deg; animation-delay: 0.5s;"></div>
+<div class="confetti" style="left: 35%; --translateX: 80px; --rotateDeg: 180deg; animation-delay: 1s;"></div>
+<div class="confetti" style="left: 50%; --translateX: -10px; --rotateDeg: 270deg; animation-delay: 1.5s;"></div>
+<div class="confetti" style="left: 65%; --translateX: 60px; --rotateDeg: 300deg; animation-delay: 2s;"></div>
+<div class="confetti" style="left: 80%; --translateX: -30px; --rotateDeg: 90deg; animation-delay: 2.5s;"></div>
+<div class="confetti" style="left: 90%; --translateX: 10px; --rotateDeg: 200deg; animation-delay: 3s;"></div>
+<div class="confetti" style="left: 25%; --translateX: 40px; --rotateDeg: 75deg; animation-delay: 0.2s;"></div>
+<div class="confetti" style="left: 45%; --translateX: -70px; --rotateDeg: 150deg; animation-delay: 1.2s;"></div>
+<div class="confetti" style="left: 75%; --translateX: 20px; --rotateDeg: 240deg; animation-delay: 2.2s;"></div>
+</div>
+<div class="winning-container">
+<h1 id="winning-page-title">🎉 বিজয়ী হয়েছে 🎉</h1>
+<p style="font-size: 20px; color: #555;">অসাধারণ একটি খেলা উপহার দেওয়ার জন্য ধন্যবাদ।</p>
+<div class="winner-name" id="final-winner">
+        ...
+    </div>
+
+    <h2 style="margin-top: 30px; font-size: 24px; color: #374151;">ফাইনাল র‍্যাঙ্কিং</h2>
+
+    <ul class="rankings-list" id="score-rankings">
+    </ul>
+
+    <button id="backToMenuBtn" class="btn btn-primary" style="font-size: 18px; padding: 12px 30px;">
+        মেনুতে ফিরুন
+    </button>
+</div>
+</div>
+<audio id="lineSound" src="line.mp3" preload="auto"></audio>
+<audio id="captureSound" src="capture.mp3" preload="auto"></audio>
+<audio id="backgroundSound" src="background.mp3" loop preload="auto"></audio>
+<div class="notification-container" id="notificationContainer"></div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+function showPage(pageId) {
+document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+document.querySelector(pageId).classList.add('active');
+if(pageId !== '#page-game-main') { stopTimer(); }
+}
+
+function playSound(type) {
+const audio = document.getElementById(type + 'Sound');
+if (audio) {
+audio.currentTime = 0;
+audio.play().catch(e => {});
+}
+}
+
+const gameBoard = document.getElementById('game-board');
+const playerTurnDisplay = document.getElementById('player-turn');
+const winnerMessage = document.getElementById('winner-message');
+const gridSizeInput = document.getElementById('grid-size');
+const startGameButton = document.getElementById('start-game');
+const numPlayersSelect = document.getElementById('num-players');
+const applyPlayersBtn = document.getElementById('apply-players');
+const playerNameList = document.getElementById('player-name-list');
+const scoreBoardEl = document.getElementById('score-board');
+// NEW: Timer Select Element
+const timerSelect = document.getElementById('timer-select');
+
+// Winning Page Elements
+const finalWinnerEl = document.getElementById('final-winner');
+const scoreRankingsEl = document.getElementById('score-rankings');
+const winningPageTitle = document.getElementById('winning-page-title');
+const backToMenuBtn = document.getElementById('backToMenuBtn');
+
+// Rules Modal Elements
+const rulesModal = document.getElementById('rules-modal');
+const menuToggleBtnMenu = document.getElementById('menuToggleBtnMenu'); 
+const menuToggleBtnGame = document.getElementById('menuToggleBtnGame'); 
+const modalCloseBtn = document.getElementById('modalCloseBtn');
+const openingLoaderBtn = document.getElementById('openingLoaderBtn'); 
+
+// Controls
+const resetBtn = document.getElementById('resetBtn');
+const backBtn = document.getElementById('backBtn');
+const backgroundSound = document.getElementById('backgroundSound');
+let isMuted = true;
+backgroundSound.muted = true;
+
+// Timer Elements
+const timerBar = document.getElementById('timer-bar');
+const timerCountdown = document.getElementById('timer-countdown');
+const timerContainer = document.getElementById('timer-container'); // To show/hide
+let MOVE_TIME_LIMIT = 60000; 
+let timerInterval = null;
+let timerStartTime = 0;
+let timeRemainingOnPause = MOVE_TIME_LIMIT; 
+let isTimerEnabled = true; // NEW Flag
+
+// Pause Elements
+const pauseBtn = document.getElementById('pauseBtn');
+const unpauseBtn = document.getElementById('unpauseBtn');
+const pauseOverlay = document.getElementById('pause-overlay');
+let isPaused = false;
+
+const particlesContainerMenu = document.getElementById('particlesContainerMenu');
+const particlesContainerOpening = document.getElementById('particlesContainerOpening');
+const particlesContainerTransition = document.getElementById('particlesContainerTransition');
+
+
+const PLAYER_COLORS = ['#e74c3c','#3498db','#2ecc71','#f1c40f','#9b59b6','#e67e22'];
+let players = [];
+let currentPlayerIndex = 0;
+const CELL = 40; const DOT = 12; const OFFSET = 14; const LINE_THICK = 10;
+let gridSize = 10; let totalBoxes = 0; let lines = {}; let boxes = {};
+let isGameOver = false; let isProcessing = false;
+
+const MILESTONES = [5, 10, 20, 35, 50]; 
+
+// --- NOTIFICATION LOGIC ---
+function createSparks(containerId, playerColor) {
+const container = document.getElementById(containerId);
+if (!container) return;
+const sparksCount = 12;
+
+for (let i = 0; i < sparksCount; i++) {
+setTimeout(() => {
+const spark = document.createElement('div');
+spark.classList.add('spark');
+spark.style.background = playerColor;
+spark.style.boxShadow = `0 0 6px 2px ${playerColor}`;
+const leftPos = Math.random() * 100;
+spark.style.left = `${leftPos}%`;
+spark.style.bottom = '0';
+const moveX = (Math.random() - 0.5) * 60;
+spark.style.setProperty('--move-x', `${moveX}px`);
+const duration = 1 + Math.random() * 1.5;
+const delay = Math.random() * 1.5;
+spark.style.animation = `sparkAnimation ${duration}s ease-in ${delay}s forwards`;
+container.appendChild(spark);
+setTimeout(() => {
+if (spark.parentNode === container) {
+container.removeChild(spark);
+}
+}, (duration + delay) * 1000);
+}, i * 150);
+}
+}
+
+function startSparkAnimation(notificationId, playerColor) {
+const sparksContainerId = `sparks-container-${notificationId}`;
+createSparks(sparksContainerId, playerColor);
+const intervalId = setInterval(() => {
+createSparks(sparksContainerId, playerColor);
+}, 2000);
+setTimeout(() => {
+clearInterval(intervalId);
+}, 4000);
+}
+
+function createNotification(title, message, playerColor, icon = '🏆') {
+const container = document.getElementById('notificationContainer');
+const notificationId = 'notification-' + Date.now();
+const notification = document.createElement('div');
+notification.className = 'notification';
+notification.id = notificationId;
+notification.innerHTML = `
+<div class="notification-header">
+<div class="notification-icon" style="background: linear-gradient(135deg, ${playerColor} 0%, var(--primary) 100%);">
+${icon}
+</div>
+<div class="notification-title" style="color:${playerColor}">${title}</div>
+</div>
+<div class="notification-content">
+${message}
+</div>
+<div class="notification-time">এইমাত্র</div>
+<div class="progress-bar" style="background: linear-gradient(90deg, ${playerColor} 0%, var(--win-color) 100%);"></div>
+<div class="sparks-container" id="sparks-container-${notificationId}"></div>
+`;
+notification.style.borderColor = playerColor;
+container.insertBefore(notification, container.firstChild); 
+setTimeout(() => {
+notification.classList.add('active');
+startSparkAnimation(notificationId, playerColor);
+const progressBar = notification.querySelector('.progress-bar');
+progressBar.style.transition = 'transform 4s linear';
+progressBar.style.transform = 'scaleX(0)';
+setTimeout(() => {
+notification.classList.remove('active');
+notification.classList.add('hiding');
+setTimeout(() => {
+if (notification.parentNode) {
+notification.parentNode.removeChild(notification);
+}
+}, 500);
+}, 4000);
+}, 100);
+return notificationId;
+}
+// --- END NOTIFICATION LOGIC ---
+
+// --- PARTICLE LOGIC ---
+function createParticles(containerEl, isClick = false) {
+const particlesCount = isClick ? 25 : 8; 
+const colors = ['#ff6b6b', '#ffd93d', '#6bcf7f', '#4d96ff', '#6a11cb'];
+for (let i = 0; i < particlesCount; i++) {
+setTimeout(() => {
+const particle = document.createElement('div');
+particle.classList.add('particle-nnuu'); 
+const leftPos = 10 + Math.random() * 80;
+particle.style.left = `${leftPos}%`;
+particle.style.bottom = '0';
+const moveX = (Math.random() - 0.5) * 60; 
+particle.style.setProperty('--move-x', `${moveX}px`);
+const size = 3 + Math.random() * 3;
+particle.style.width = `${size}px`;
+particle.style.height = `${size}px`;
+const randomColor = colors[Math.floor(Math.random() * colors.length)];
+particle.style.background = randomColor;
+particle.style.boxShadow = `0 0 6px 1px ${randomColor}`;
+const duration = 1.5 + Math.random() * 1.5;
+const delay = Math.random() * 0.5;
+particle.style.animation = `particleFloat ${duration}s ease-out ${delay}s forwards`;
+containerEl.appendChild(particle);
+setTimeout(() => {
+if (particle.parentNode === containerEl) {
+containerEl.removeChild(particle);
+}
+}, (duration + delay) * 1000);
+}, i * (isClick ? 50 : 150));
+}
+}
+
+function createLoadingParticles(containerEl) {
+if (!containerEl) return;
+const particlesCount = 8;
+const colors = ['#ff9a3c', '#ff6b6b', '#6a11cb', '#2575fc', '#38ef7d', '#eea849'];
+for (let i = 0; i < particlesCount; i++) {
+setTimeout(() => {
+const particle = document.createElement('div');
+particle.classList.add('particle-nul'); 
+const leftPos = Math.random() * 100;
+particle.style.left = `${leftPos}%`;
+particle.style.bottom = '0';
+const moveX = (Math.random() - 0.5) * 100;
+particle.style.setProperty('--move-x', `${moveX}px`);
+const size = 2 + Math.random() * 4;
+particle.style.width = `${size}px`;
+particle.style.height = `${size}px`;
+const randomColor = colors[Math.floor(Math.random() * colors.length)];
+particle.style.background = randomColor;
+particle.style.boxShadow = `0 0 6px 2px ${randomColor}`;
+const duration = 1 + Math.random() * 2;
+const delay = Math.random() * 1;
+particle.style.animation = `particleFloatNul ${duration}s ease-out ${delay}s forwards`;
+containerEl.appendChild(particle);
+setTimeout(() => {
+if (particle.parentNode === containerEl) {
+containerEl.removeChild(particle);
+}
+}, (duration + delay) * 1000);
+}, i * 100);
+}
+}
+// --- END PARTICLE LOGIC ---
+
+function renderNameInputs(){
+const n = parseInt(numPlayersSelect.value, 10);
+playerNameList.innerHTML = '';
+for(let i=0;i<n;i++){
+const div = document.createElement('div');
+div.className = 'player-name-item';
+const colorDot = document.createElement('div');
+colorDot.className = 'dot';
+colorDot.style.background = PLAYER_COLORS[i];
+colorDot.style.width = '14px'; colorDot.style.height = '14px'; colorDot.style.position = 'relative';
+colorDot.style.transform = 'scale(1)';
+const input = document.createElement('input');
+input.type = 'text';
+input.id = `player-name-${i}`;
+input.setAttribute('placeholder', `প্লেয়ার ${i+1}`);
+div.appendChild(colorDot);
+div.appendChild(input);
+playerNameList.appendChild(div);
+}
+}
+
+function buildPlayersFromInputs(){
+const n = parseInt(numPlayersSelect.value,10);
+const arr = [];
+for(let i=0;i<n;i++){
+const nameInput = document.getElementById(`player-name-${i}`);
+const name = (nameInput ? nameInput.value.trim() : '') || `প্লেয়ার ${i+1}`;
+arr.push({ name, color: PLAYER_COLORS[i], score: 0, isBot: false, notifiedMilestones: [] });
+}
+if(n === 1){
+arr.push({ name: 'কম্পিউটার', color: PLAYER_COLORS[n], score:0, isBot:true, notifiedMilestones: [] });
+}
+return arr;
+}
+
+function renderScoreBoard(){
+scoreBoardEl.innerHTML = '';
+players.forEach((p, idx) => {
+const el = document.createElement('div');
+el.className = 'player-score';
+el.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:50%;display:inline-block;background:${p.color}"></span><span style="font-weight:700">${p.isBot ? '🤖' : ''} ${p.name}</span></span><span style="margin-left:6px" id="score-val-${idx}">${p.score}</span>`;
+scoreBoardEl.appendChild(el);
+});
+}
+
+function initGame(){
+gameBoard.innerHTML = ''; winnerMessage.textContent = ''; isGameOver = false; lines = {}; boxes = {};
+players.forEach(p => { p.score = 0; p.notifiedMilestones = []; }); 
+renderScoreBoard();
+currentPlayerIndex = 0;
+gridSize = Math.max(10, Math.min(30, parseInt(gridSizeInput.value) || 10));
+totalBoxes = (gridSize - 1) * (gridSize - 1);
+const boardSize = OFFSET * 2 + (gridSize - 1) * CELL + DOT;
+gameBoard.style.width = boardSize + 'px'; gameBoard.style.height = boardSize + 'px';
+createGrid();
+updatePlayerTurnDisplay();
+updateScoreBoard();
+
+// Initialize Timer Variables from Selection
+const selectedTime = parseInt(timerSelect.value, 10);
+if (selectedTime === 0) {
+    isTimerEnabled = false;
+    timerContainer.style.display = 'none'; // Hide timer bar if disabled
+    MOVE_TIME_LIMIT = 999999999; // Effectively infinite
+} else {
+    isTimerEnabled = true;
+    timerContainer.style.display = 'block';
+    MOVE_TIME_LIMIT = selectedTime * 1000;
+}
+
+timeRemainingOnPause = MOVE_TIME_LIMIT; 
+startTimer();
+if(players[currentPlayerIndex] && players[currentPlayerIndex].isBot){ setTimeout(() => botMove(), 300); }
+}
+
+function createGrid(){
+for(let y=0;y<gridSize;y++) for(let x=0;x<gridSize;x++){
+const dot = document.createElement('div'); dot.className = 'dot';
+dot.style.left = (OFFSET + x * CELL - DOT/2) + 'px'; dot.style.top = (OFFSET + y * CELL - DOT/2) + 'px';
+dot.style.background = '#111'; 
+gameBoard.appendChild(dot);
+setTimeout(() => dot.classList.add('pop'), 50 * (y + x));
+}
+for(let y=0;y<gridSize;y++) for(let x=0;x<gridSize-1;x++){ const id = `h-${x}-${y}`; gameBoard.appendChild(createLineElement('h', x, y, id)); lines[id] = false; }
+for(let y=0;y<gridSize-1;y++) for(let x=0;x<gridSize;x++){ const id = `v-${x}-${y}`; gameBoard.appendChild(createLineElement('v', x, y, id)); lines[id] = false; }
+}
+
+function createLineElement(type, x, y, id){
+const line = document.createElement('div'); line.classList.add('line'); line.dataset.id = id;
+const inner = document.createElement('div'); inner.className = 'line-inner'; line.appendChild(inner);
+if(type === 'h'){
+line.style.left = `${OFFSET + x * CELL + DOT/2}px`; line.style.top = `${OFFSET + y * CELL - LINE_THICK/2}px`;
+line.style.width = `${CELL - DOT}px`; line.style.height = `${LINE_THICK}px`;
+} else {
+line.style.left = `${OFFSET + x * CELL - LINE_THICK/2}px`; line.style.top = `${OFFSET + y * CELL + DOT/2}px`;
+line.style.width = `${LINE_THICK}px`; line.style.height = `${CELL - DOT}px`;
+}
+line.addEventListener('click', () => handleLineClick(line)); return line;
+}
+
+function handleLineClick(lineEl){
+if(isGameOver || isProcessing || isPaused || (players[currentPlayerIndex] && players[currentPlayerIndex].isBot) || rulesModal.classList.contains('modal-active')) return;
+const id = lineEl.dataset.id; if(lines[id]) return;
+isProcessing = true; drawLine(id, lineEl);
+}
+
+function drawLine(lineId, lineElement){
+if(lines[lineId]) { isProcessing = false; return; }
+lineElement.classList.add('drawn');
+const pIndex = currentPlayerIndex;
+lineElement.querySelector('.line-inner').style.background = players[pIndex].color;
+lines[lineId] = true;
+let completedCount = 0;
+const [type, sx, sy] = lineId.split('-'); const col = parseInt(sx,10), row = parseInt(sy,10);
+if(type === 'h'){
+if(checkBox(col, row, pIndex)) completedCount++; if(checkBox(col, row - 1, pIndex)) completedCount++;
+} else {
+if(checkBox(col, row, pIndex)) completedCount++; if(checkBox(col - 1, row, pIndex)) completedCount++;
+}
+
+if(completedCount > 0){
+playSound('capture');
+updateScoreBoard();
+
+const player = players[pIndex];
+const currentScore = player.score;
+
+MILESTONES.forEach(milestone => {
+if (currentScore >= milestone && !player.notifiedMilestones.includes(milestone)) {
+createNotification(
+`🎉 পয়েন্ট মাইলফলক!`,
+`${player.isBot ? '🤖' : ''} ${player.name}, অভিনন্দন! আপনি ${milestone} পয়েন্ট দখল করেছেন।`,
+player.color
+);
+player.notifiedMilestones.push(milestone);
+}
+});
+
+if(Object.keys(boxes).length === totalBoxes){ endGame(); return; }
+isProcessing = false; 
+} else {
+playSound('line'); currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+timeRemainingOnPause = MOVE_TIME_LIMIT; 
+startTimer(); 
+}
+
+updatePlayerTurnDisplay();
+
+if(isGameOver) { isProcessing = false; return; }
+
+const next = players[currentPlayerIndex];
+winnerMessage.textContent = '';
+
+if(next && next.isBot){
+setTimeout(() => botMove(), 300);
+} else if (completedCount === 0) {
+isProcessing = false; 
+}
+}
+
+function checkBox(col, row, playerIndex){
+if(col < 0 || row < 0 || col >= gridSize-1 || row >= gridSize-1 || boxes[`${col}-${row}`]) return false;
+const hTop = `h-${col}-${row}`, hBottom = `h-${col}-${row+1}`, vLeft = `v-${col}-${row}`, vRight = `v-${col+1}-${row}`;
+if(lines[hTop] && lines[hBottom] && lines[vLeft] && lines[vRight]){
+boxes[`${col}-${row}`] = true;
+const box = document.createElement('div'); box.className = 'box';
+box.style.left = `${OFFSET + col * CELL + DOT/2}px`; box.style.top = `${OFFSET + row * CELL + DOT/2}px`;
+box.style.width = `${CELL - DOT}px`; box.style.height = `${CELL - DOT}px`;
+box.style.background = players[playerIndex].color;
+box.textContent = players[playerIndex].name.charAt(0).toUpperCase();
+gameBoard.appendChild(box); setTimeout(()=>box.classList.add('filled'), 20);
+players[playerIndex].score++; return true;
+}
+return false;
+}
+
+function startTimer() {
+stopTimer();
+if (isGameOver || isPaused || !isTimerEnabled) return;
+
+let initialRemainingTime = timeRemainingOnPause;
+
+if (initialRemainingTime === MOVE_TIME_LIMIT) {
+timerStartTime = Date.now();
+} else {
+timerStartTime = Date.now() - (MOVE_TIME_LIMIT - initialRemainingTime);
+}
+
+timeRemainingOnPause = MOVE_TIME_LIMIT;
+
+const elapsedTime = Date.now() - timerStartTime;
+const remainingTime = MOVE_TIME_LIMIT - elapsedTime;
+const percentage = (remainingTime / MOVE_TIME_LIMIT) * 100;
+const secondsRemaining = Math.ceil(remainingTime / 1000);
+
+timerBar.style.width = percentage + '%';
+timerCountdown.textContent = secondsRemaining + 's';
+timerBar.style.background = percentage < 20
+? 'linear-gradient(90deg, #f1c40f, var(--danger))'
+: 'linear-gradient(90deg, var(--win-color), var(--primary))';
+
+
+timerInterval = setInterval(() => {
+if (isPaused || isGameOver || isProcessing) return; 
+
+const elapsedTime = Date.now() - timerStartTime;
+const remainingTime = MOVE_TIME_LIMIT - elapsedTime;
+
+if (remainingTime <= 0) {
+clearInterval(timerInterval);
+timerBar.style.width = '0%';
+timerCountdown.textContent = '0s';
+handleTimeout();
+return;
+}
+
+const percentage = (remainingTime / MOVE_TIME_LIMIT) * 100;
+timerBar.style.width = percentage + '%';
+
+const secondsRemaining = Math.ceil(remainingTime / 1000);
+timerCountdown.textContent = secondsRemaining + 's';
+
+if (percentage < 20) {
+timerBar.style.background = 'linear-gradient(90deg, #f1c40f, var(--danger))';
+} else {
+timerBar.style.background = 'linear-gradient(90deg, var(--win-color), var(--primary))';
+}
+
+}, 100);
+}
+
+function stopTimer() {
+if (timerInterval) {
+clearInterval(timerInterval);
+timerInterval = null;
+}
+}
+
+function handleTimeout() {
+if (isGameOver || isProcessing || isPaused) return;
+
+const currentPlayer = players[currentPlayerIndex];
+if (currentPlayer && !currentPlayer.isBot) {
+winnerMessage.textContent = `${currentPlayer.name} সময় শেষ! সিস্টেম অটো মুভ করছে...`;
+winnerMessage.style.color = '#e67e22';
+setTimeout(() => botMove(true), 100);
+} else if (currentPlayer && currentPlayer.isBot) {
+setTimeout(() => botMove(), 100);
+} else {
+startTimer();
+}
+}
+
+function pauseGame() {
+if (isGameOver || isPaused || rulesModal.classList.contains('modal-active')) return;
+
+isPaused = true;
+
+const elapsedTime = Date.now() - timerStartTime;
+timeRemainingOnPause = MOVE_TIME_LIMIT - elapsedTime;
+
+stopTimer();
+pauseOverlay.classList.add('active');
+}
+
+function unpauseGame() {
+if (isGameOver) return;
+
+isPaused = false;
+pauseOverlay.classList.remove('active');
+startTimer(); 
+
+if(players[currentPlayerIndex] && players[currentPlayerIndex].isBot){
+setTimeout(() => botMove(), 300);
+}
+}
+
+function updatePlayerTurnDisplay(){
+if(players.length === 0) { playerTurnDisplay.textContent = ''; return; }
+const p = players[currentPlayerIndex];
+playerTurnDisplay.innerHTML = `🎯 এখন খেলছে: <span style="color:${p.color}; font-weight:800">${p.isBot ? '🤖' : ''} ${p.name}</span>`;
+}
+
+function updateScoreBoard(){ players.forEach((p, idx) => { const el = document.getElementById(`score-val-${idx}`); if(el) el.textContent = p.score; }); }
+
+function endGame(){
+isGameOver = true;
+stopTimer(); 
+let topScore = -1, winners = [];
+
+const finalRankings = [...players].sort((a, b) => b.score - a.score);
+
+topScore = finalRankings[0].score; 
+winners = finalRankings.filter(p => p.score === topScore);
+
+if(winners.length > 1) { winnerMessage.textContent = '🤝 খেলা ড্র!'; winnerMessage.style.color = '#333'; }
+else { winnerMessage.textContent = `🏆 বিজয়ী: ${winners[0].name}`; winnerMessage.style.color = winners[0].color; }
+
+displayWinningPage(finalRankings, winners);
+}
+
+function displayWinningPage(rankings, winners){
+if(winners.length > 1){
+winningPageTitle.textContent = '🤝 খেলা ড্র!';
+finalWinnerEl.textContent = `${winners.length} জন ড্র করেছেন!`;
+finalWinnerEl.style.color = '#333';
+} else {
+winningPageTitle.textContent = '🎉 বিজয়ী হয়েছে 🎉';
+finalWinnerEl.textContent = `${winners[0].isBot ? '🤖' : ''} ${winners[0].name}`;
+finalWinnerEl.style.color = winners[0].color; 
+}
+
+scoreRankingsEl.innerHTML = '';
+rankings.forEach((p, index) => {
+const rank = index + 1;
+const li = document.createElement('li');
+li.className = 'rank-item';
+if (rank === 1 && winners.length === 1) li.style.background = '#e6ffed';
+if (rank === 1 && winners.length > 1) li.style.background = '#fcf0ff'; 
+
+li.innerHTML = `
+<div class="name-score">
+<span class="rank-pos">#${rank}</span>
+<span class="dot" style="background: ${p.color}; position: relative; transform: scale(1); box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></span>
+<span>${p.isBot ? '🤖' : ''} ${p.name}</span>
+</div>
+<strong>${p.score} পয়েন্ট</strong>
+`;
+scoreRankingsEl.appendChild(li);
+});
+
+showPage('#page-transition-loader');
+setTimeout(() => {
+showPage('#page-winning');
+isProcessing = false; 
+}, 2500); // Faster Transition (2.5s)
+}
+
+
+function botMove(isAutoMove = false){
+if(isGameOver || isPaused) { isProcessing = false; return; }
+isProcessing = true;
+const available = Object.keys(lines).filter(id => !lines[id]);
+if(available.length === 0) { isProcessing = false; return; }
+let best = []; let bestCount = -1;
+
+for(const id of available){
+const c = willCompleteBoxes(id); if(c > bestCount){ bestCount = c; best = [id]; } else if(c === bestCount){ best.push(id); }
+}
+
+let choice = (bestCount > 0) ? best[Math.floor(Math.random() * best.length)] : available[Math.floor(Math.random() * available.length)];
+
+if (isAutoMove) {
+winnerMessage.textContent = `${players[currentPlayerIndex].name} সময় শেষ! সিস্টেম অটো মুভ করলো।`;
+winnerMessage.style.color = '#e67e22';
+}
+
+const el = document.querySelector(`.line[data-id="${choice}"]`);
+if(el){ setTimeout(()=> { drawLine(choice, el); }, 120); } else { isProcessing = false; }
+}
+
+function willCompleteBoxes(lineId){
+const [type, sx, sy] = lineId.split('-'); const col = parseInt(sx,10), row = parseInt(sy,10); let count = 0;
+function boxWouldComplete(c, r){
+if(c < 0 || r < 0 || c >= gridSize-1 || r >= gridSize-1 || boxes[`${c}-${r}`]) return false;
+function drawn(id){ return id === lineId || !!lines[id]; }
+return drawn(`h-${c}-${r}`) && drawn(`h-${c}-${r+1}`) && drawn(`v-${c}-${r}`) && drawn(`v-${c+1}-${r}`);
+}
+if(type === 'h'){ if(boxWouldComplete(col, row)) count++; if(boxWouldComplete(col, row-1)) count++; }
+else { if(boxWouldComplete(col, row)) count++; if(boxWouldComplete(col-1, row)) count++; }
+return count;
+}
+
+function openModal() {
+if(document.querySelector('#page-game-main').classList.contains('active')) { pauseGame(); }
+rulesModal.style.display = 'flex'; 
+void rulesModal.offsetHeight;
+rulesModal.classList.add('modal-active');
+rulesModal.classList.remove('modal-closing');
+}
+function closeModal() {
+rulesModal.classList.add('modal-closing');
+rulesModal.classList.remove('modal-active');
+setTimeout(() => {
+rulesModal.style.display = 'none'; 
+rulesModal.classList.remove('modal-closing');
+if(isPaused) unpauseGame();
+}, 300); 
+}
+
+rulesModal.addEventListener('click', (e) => {
+if (e.target === rulesModal) closeModal();
+});
+
+menuToggleBtnMenu.addEventListener('click', openModal);
+menuToggleBtnGame.addEventListener('click', openModal);
+modalCloseBtn.addEventListener('click', closeModal);
+
+
+openingLoaderBtn.addEventListener('click', () => {
+showPage('#page-menu');
+renderNameInputs(); 
+});
+
+
+applyPlayersBtn.addEventListener('click', renderNameInputs);
+numPlayersSelect.addEventListener('change', renderNameInputs);
+
+startGameButton.addEventListener('click', () => {
+
+const startBtnEl = document.getElementById('start-game');
+startBtnEl.style.transform = 'scale(0.95)';
+startBtnEl.style.animation = 'gradientShift 1.5s ease';
+
+for (let i = 0; i < 3; i++) {
+setTimeout(() => {
+createParticles(particlesContainerMenu, true);
+}, i * 200);
+}
+
+setTimeout(() => {
+startBtnEl.style.transform = '';
+startBtnEl.style.animation = 'gradientShift 6s ease infinite';
+}, 500);
+
+const n = parseInt(numPlayersSelect.value, 10);
+if(playerNameList.children.length !== n) renderNameInputs();
+
+backgroundSound.play().catch(e => {});
+backgroundSound.muted = isMuted;
+
+showPage('#page-transition-loader');
+
+setTimeout(() => {
+players = buildPlayersFromInputs();
+initGame();
+showPage('#page-game-main');
+}, 2500); // Faster Transition (2.5s)
+});
+
+startGameButton.addEventListener('mouseenter', function() {
+createParticles(particlesContainerMenu);
+});
+
+const particleInterval = setInterval(() => {
+if (document.getElementById('page-menu').classList.contains('active')) {
+createParticles(particlesContainerMenu);
+}
+}, 800);
+
+const openingParticleInterval = setInterval(() => {
+if (document.getElementById('page-opening').classList.contains('active')) {
+createLoadingParticles(particlesContainerOpening);
+}
+}, 800);
+
+const transitionParticleInterval = setInterval(() => {
+if (document.getElementById('page-transition-loader').classList.contains('active')) {
+createLoadingParticles(particlesContainerTransition);
+}
+}, 800);
+
+
+resetBtn.addEventListener('click', () => {
+if (confirm('আপনি কি নিশ্চিত যে চলতি গেমটি রিসেট করতে চান? এটি করলে বর্তমান স্কোর ও অগ্রগতি নষ্ট হবে। বাতিল করলে খেলা চলতে থাকবে।')) {
+unpauseGame(); 
+initGame(); 
+}
+});
+
+backBtn.addEventListener('click', () => {
+if (confirm('আপনি কি নিশ্চিত যে মেনুতে ফিরবেন? এটি করলে বর্তমান স্কোর ও অগ্রগতি নষ্ট হবে। বাতিল করলে খেলা চলতে থাকবে।')) {
+unpauseGame(); 
+showPage('#page-transition-loader'); 
+setTimeout(() => {
+showPage('#page-menu'); 
+}, 2500); // Faster Transition (2.5s)
+}
+});
+
+backToMenuBtn.addEventListener('click', () => {
+showPage('#page-menu');
+});
+
+pauseBtn.addEventListener('click', pauseGame);
+unpauseBtn.addEventListener('click', unpauseGame);
+
+
+});
+</script>
+</body>
+</html>
