@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="google" content="notranslate">
-<meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Vercel Topup BD</title>
 
@@ -79,10 +78,8 @@
         overflow-y: auto; 
         overflow-x: hidden; 
         padding: 20px;
-        
         padding-top: 0; 
-        
-        padding-bottom: 180px; 
+        padding-bottom: 200px; /* পরিবর্তন ২: বটম প্যাডিং বাড়ানো হয়েছে */
         scrollbar-width: none; 
     }
     .screen::-webkit-scrollbar { display: none; } 
@@ -144,24 +141,18 @@
     .header { 
         display: flex; justify-content: space-between; align-items: center; 
         padding: 10px 20px; 
-        
         margin-bottom: 0px;
-        
         position: sticky;
         top: 0;
-        
         margin-left: -20px; 
         margin-right: -20px;
         margin-top: 0;
-        
         z-index: 999;
-        
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         background-color: rgba(255, 255, 255, 0.6); 
         border-bottom: 1px solid rgba(0,0,0,0.05);
     }
-
     
     body.dark-mode .header {
         background-color: rgba(0, 0, 0, 0.6); 
@@ -173,17 +164,32 @@
     .header-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary-text-color); }
     .header .profile-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; cursor: pointer; border: 2px solid var(--card-bg-color); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .header-right-icons { display: flex; align-items: center; gap: 15px; }
+    
+    /* সংযোজন ১: হেডার ওয়ালেট স্টাইল */
+    #headerWalletDisplay {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        background-color: var(--light-purple);
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
+    #headerWalletDisplay i {
+        color: var(--primary-purple);
+    }
+    #headerWalletBalance {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--primary-text-color);
+    }
 
     
     .marquee-wrapper {
         background-color: var(--card-bg-color);
         padding: 10px 0;
         border-radius: var(--border-radius-medium);
-        
         margin-top: 0px;
-        
         margin-bottom: 25px;
-        
         box-shadow: var(--soft-shadow);
         overflow: hidden;
         position: relative;
@@ -221,7 +227,6 @@
     }
     .game-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; padding-bottom: 10px;}
     
-    
     .game-card {
         background: var(--card-bg-color);
         border-radius: var(--border-radius-large);
@@ -236,13 +241,34 @@
         position: relative; 
     }
     
+    /* পরিবর্তন ১: আন এভেইলেবল স্টাইল */
+    .unavailable-overlay {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(255, 255, 255, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+    }
+    body.dark-mode .unavailable-overlay {
+        background-color: rgba(28, 28, 30, 0.7);
+    }
+    .unavailable-overlay img {
+        width: 70%;
+        max-width: 100px;
+    }
+    .game-card.disabled {
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
     
     
     .card-badge {
         position: absolute;
         top: 0; 
         right: 0;
-        
         background-color: transparent;
         color: inherit;
         font-size: 16px; 
@@ -259,7 +285,6 @@
         border-radius: 0 0 0 15px; 
         text-shadow: 0 2px 5px rgba(0,0,0,0.15); 
     }
-
     
     .card-badge::after {
         content: '';
@@ -304,7 +329,6 @@
     
     .page-header { 
         display: flex; align-items: center; margin-bottom: 25px; padding-top: 10px;
-        
     }
     .back-btn { font-size: 20px; cursor: pointer; margin-right: 15px; color: var(--primary-text-color); background: var(--card-bg-color); padding: 10px; border-radius: 50%; box-shadow: var(--soft-shadow); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;}
     .page-header h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
@@ -317,13 +341,11 @@
     
     .input-group label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 14px; color: var(--secondary-text-color); margin-left: 2px;}
     
-    
     .copy-btn { margin-left: 10px; cursor: pointer; color: var(--primary-purple); background: rgba(123, 97, 255, 0.1); padding: 5px 10px; border-radius: 6px; font-size: 14px; transition: 0.2s;}
     .copy-btn:active { transform: scale(0.9); }
 
     .package-grid, .payment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
     .package-item { background-color: var(--background-color); border: 2px solid transparent; border-radius: var(--border-radius-medium); padding: 20px 15px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
-    
     
     .package-item.disabled {
         opacity: 0.5;
@@ -418,7 +440,6 @@
         height: 80px;
         display: flex; justify-content: space-between; align-items: center;
         background-color: var(--card-bg-color);
-        
         backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
         background-color: rgba(255, 255, 255, 0.9);
         padding: 0 20px;
@@ -452,7 +473,6 @@
         display: none; 
         z-index: 5;
     }
-    
     
     .nav-item-center { position: relative; top: -25px; }
     .nav-item-center .icon-bg { 
@@ -508,7 +528,6 @@
         z-index: 1001;
     }
     .support-fab:active { transform: scale(0.9); }
-    
     
     .chat-popover {
         position: absolute;
@@ -589,7 +608,6 @@
     .status-indicator.online .dot { background-color: #34C759; }
     .status-indicator.offline .dot { background-color: #FF3B30; }
 
-    /* টার্মস সেকশন স্টাইল */
     .terms-section {
         padding: 20px;
         margin: 30px 0;
@@ -610,7 +628,7 @@
         white-space: pre-wrap;
     }
     
-    /* নতুন সংযোজন: ইভেন্ট সেকশন স্টাইল */
+    /* সংযোজন ৪: ইভেন্ট সেকশন স্টাইল */
     .event-section-wrapper {
         position: relative;
         padding-top: 30px;
@@ -622,7 +640,16 @@
         padding: 20px;
         padding-top: 45px;
         background: linear-gradient(45deg, var(--light-purple), transparent);
+        box-shadow: 0 0 15px 3px rgba(123, 97, 255, 0.5); /* গ্লো ইফেক্ট */
+        animation: pulse-glow 2.5s infinite alternate; /* গ্লো অ্যানিমেশন */
+        display: flex; /* একটি গেম থাকলে সেন্টারে দেখানোর জন্য */
+        justify-content: center; /* একটি গেম থাকলে সেন্টারে দেখানোর জন্য */
     }
+    @keyframes pulse-glow {
+        from { box-shadow: 0 0 15px 3px rgba(123, 97, 255, 0.4); }
+        to { box-shadow: 0 0 25px 8px rgba(123, 97, 255, 0.6); }
+    }
+
     .event-header-tab {
         position: absolute;
         top: 0;
@@ -655,6 +682,26 @@
     }
     body.dark-mode .event-header-tab { background-color: var(--background-color); }
     body.dark-mode .event-timer { background-color: #2C2C2E; }
+
+    /* সংযোজন ৩: কপিরাইট ফুটার স্টাইল */
+    #copyright-footer {
+        position: fixed;
+        bottom: 80px; /* নেভিগেশন বারের উপরে */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 480px;
+        background-color: var(--background-color);
+        color: var(--secondary-text-color);
+        text-align: center;
+        padding: 8px 0;
+        font-size: 12px;
+        z-index: 999;
+        border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    body.dark-mode #copyright-footer {
+        border-color: rgba(255,255,255,0.08);
+    }
 </style>
 </head>
 <body>
@@ -698,7 +745,6 @@
                     <input type="password" id="signUpPassword" placeholder="নতুন পাসওয়ার্ড দিন">
                     <i class="fa-solid fa-eye password-toggle-icon" onclick="togglePasswordVisibility(this)"></i>
                 </div>
-                <!-- নতুন সংযোজন: পাসওয়ার্ড রি-টাইপ বক্স -->
                 <div class="input-group">
                     <input type="password" id="signUpPasswordConfirm" placeholder="পুনরায় পাসওয়ার্ড দিন">
                     <i class="fa-solid fa-eye password-toggle-icon" onclick="togglePasswordVisibility(this)"></i>
@@ -725,10 +771,14 @@
                     <span id="onlineStatusText">Offline</span>
                 </div>
                 
+                <!-- সংযোজন ১: হেডার ওয়ালেট HTML -->
+                <div id="headerWalletDisplay">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span id="headerWalletBalance">৳ 0.00</span>
+                </div>
                 
                 <i id="headerGuestIcon" class="fa-solid fa-circle-user" style="font-size: 38px; color: var(--secondary-text-color); cursor: pointer; display: block;" onclick="if(checkAuth()) showScreen('profileScreen', document.querySelectorAll('.nav-item')[4])"></i>
                 <img id="headerProfileAvatar" src="https://i.ibb.co/74CkxSP/avatar.png" alt="Avatar" class="profile-avatar" onclick="if(checkAuth()) showScreen('profileScreen', document.querySelectorAll('.nav-item')[4])" style="display: none;">
-
             </div>
         </header>
 
@@ -740,19 +790,13 @@
         </div>
 
         <div class="slider-container">
-            <div class="slider">
-                
-            </div>
+            <div class="slider"></div>
         </div>
         
-        <!-- নতুন সংযোজন: ইভেন্ট সেকশন কন্টেইনার -->
         <div id="eventSectionContainer"></div>
 
-        <div id="homeCategoriesContainer">
-            
-        </div>
+        <div id="homeCategoriesContainer"></div>
         
-        <!-- টার্মস অ্যান্ড কন্ডিশনস কন্টেইনার -->
         <div id="termsContainer" class="terms-section" style="display: none;">
             <h3 id="termsTitle"></h3>
             <p id="termsText"></p>
@@ -775,14 +819,9 @@
         </div>
         <div class="topup-section">
             <h3 class="title"><span class="step-number">3</span>পেমেন্ট মেথড বেছে নিন</h3>
-            <div class="payment-grid" id="topupPaymentGrid">
-                
-            </div>
-             <div id="paymentDetailsSection" style="display: none; margin-top: 20px;">
-                
-            </div>
+            <div class="payment-grid" id="topupPaymentGrid"></div>
+             <div id="paymentDetailsSection" style="display: none; margin-top: 20px;"></div>
         </div>
-        
         
         <div class="topup-section" id="gameDescriptionContainer" style="display:none;">
             <h3 class="title">Ruls & Condition</h3>
@@ -815,9 +854,7 @@
         </div>
         <div class="topup-section">
             <h3 class="title"><span class="step-number">2</span>পেমেন্ট মেথড বেছে নিন</h3>
-            <div class="payment-grid" id="addMoneyPaymentGrid">
-                
-            </div>
+            <div class="payment-grid" id="addMoneyPaymentGrid"></div>
              <div id="addMoneyPaymentDetailsSection" style="display: none; margin-top: 20px;">
                 <p style="text-align: center; font-weight: 600; margin-bottom: 10px;">
                     নিচের নম্বরে টাকা পাঠান: <br>
@@ -885,15 +922,13 @@
         <header class="page-header"><i class="fa-solid fa-arrow-left back-btn" onclick="showScreen('walletScreen', document.querySelectorAll('.nav-item')[1])"></i><h2>রিকোয়েস্ট পাঠানো হয়েছে</h2></header>
         <div id="moneyRequestSuccessContainer"></div>
     </div>
-
+    
+    <!-- সংযোজন ৩: কপিরাইট ফুটার HTML -->
+    <footer id="copyright-footer"></footer>
+    
     <nav class="bottom-nav">
-        
         <div class="nav-item active" onclick="showScreen('homeScreen', this)"> <i class="fa-solid fa-house"></i> <span>হোম</span> </div>
-        
-        
         <div class="nav-item" onclick="if(checkAuth()) showScreen('walletScreen', this)"> <i class="fa-solid fa-wallet"></i> <span>ওয়ালেট</span> </div>
-        
-        
         <div class="nav-item nav-item-center" onclick="if(checkAuth()) showScreen('addMoneyScreen', this)"> 
             <div class="icon-bg">
                 <i class="fa-solid fa-plus"></i>
@@ -901,14 +936,11 @@
             </div> 
             <span>অ্যাড</span> 
         </div>
-        
-        
         <div class="nav-item" onclick="if(checkAuth()) showOrderHistoryScreen(this)"> 
             <i class="fa-solid fa-receipt"></i> 
             <span class="nav-badge" id="orderBadge"></span>
             <span>অর্ডার</span> 
         </div>
-        
         <div class="nav-item" onclick="if(checkAuth()) showScreen('profileScreen', this)"> <i class="fa-regular fa-user"></i> <span>প্রোফাইল</span> </div>
     </nav>
     
@@ -925,9 +957,7 @@
                 <h2>সাপোর্ট চ্যাট</h2>
                 <span class="close-btn" id="supportCloseBtn">&times;</span>
             </div>
-            <div class="support-chat-body" id="supportChatBody">
-                
-            </div>
+            <div class="support-chat-body" id="supportChatBody"></div>
             <div class="support-chat-footer">
                 <input type="text" id="supportMessageInput" placeholder="আপনার মেসেজ লিখুন...">
                 <button id="sendMessageBtn"><i class="fa-solid fa-paper-plane"></i></button>
@@ -1046,7 +1076,6 @@
             authContainer.style.display = 'none';
             appContainer.style.display = 'block';
 
-            
             initializeAddMoneyScreen();
             loadMoneyRequestHistory();
             loadOrderHistory();
@@ -1064,8 +1093,9 @@
         initializeNoticeListener();
         initializeOnlineStatusListener();
         initializePopupListener();
-        initializeEventListener(); // নতুন সংযোজন
+        initializeEventListener();
         loadTerms();
+        loadCopyrightFooter(); // সংযোজন ৩: ফুটার লোড
     });
     
     
@@ -1199,7 +1229,6 @@
         });
     }
 
-
     async function loadBranding() {
         try {
             const doc = await db.collection('settings').doc('branding').get();
@@ -1236,19 +1265,22 @@
         const profileScreenAvatar = document.getElementById('profileScreenAvatar');
         const headerProfileAvatar = document.getElementById('headerProfileAvatar');
         const headerGuestIcon = document.getElementById('headerGuestIcon');
+        const headerWalletDisplay = document.getElementById('headerWalletDisplay'); // সংযোজন ১
 
         const avatarUrl = photoURL || "https://i.ibb.co/74CkxSP/avatar.png";
         profileScreenAvatar.src = avatarUrl;
 
-        if (name === "Guest User" || !photoURL) {
+        if (name === "Guest User" || !currentUser) { // পরিবর্তন ১: currentUser চেক
             if(headerProfileAvatar) headerProfileAvatar.style.display = 'none';
             if(headerGuestIcon) headerGuestIcon.style.display = 'block';
+            if(headerWalletDisplay) headerWalletDisplay.style.display = 'none'; // সংযোজন ১
         } else {
             if(headerProfileAvatar) {
                 headerProfileAvatar.src = avatarUrl;
                 headerProfileAvatar.style.display = 'block';
             }
             if(headerGuestIcon) headerGuestIcon.style.display = 'none';
+            if(headerWalletDisplay) headerWalletDisplay.style.display = 'flex'; // সংযোজন ১
         }
     }
     
@@ -1266,14 +1298,13 @@
         const name = document.getElementById('signUpName').value;
         const email = document.getElementById('signUpEmail').value;
         const password = document.getElementById('signUpPassword').value;
-        const passwordConfirm = document.getElementById('signUpPasswordConfirm').value; // নতুন সংযোজন
+        const passwordConfirm = document.getElementById('signUpPasswordConfirm').value;
 
         if (!name || !email || !password || !passwordConfirm) { 
             alert('অনুগ্রহ করে সকল তথ্য পূরণ করুন।'); 
             return; 
         }
 
-        // নতুন সংযোজন: পাসওয়ার্ড ম্যাচিং চেক
         if (password !== passwordConfirm) {
             alert('আপনার পাসওয়ার্ড দুটি মিলছে না।');
             return;
@@ -1331,7 +1362,6 @@
     
     function handleLogout() { 
         auth.signOut().then(() => {
-            
             goToHomeAsGuest();
         });
     }
@@ -1341,7 +1371,6 @@
         document.getElementById(screenId).classList.add('active');
     }
 
-    // নতুন সংযোজন: পাসওয়ার্ড ভিজিবিলিটি টগল ফাংশন
     function togglePasswordVisibility(icon) {
         const input = icon.previousElementSibling;
         if (input.type === "password") {
@@ -1733,6 +1762,7 @@
     function updateWalletDisplay(balance) {
         const formattedBalance = `৳ ${parseFloat(balance || 0).toFixed(2)}`;
         document.getElementById('profileWalletBalance').innerText = formattedBalance;
+        document.getElementById('headerWalletBalance').innerText = formattedBalance; // সংযোজন ১
     }
 
     function showOrderHistoryScreen(navElement) { showScreen('orderHistoryScreen', navElement); }
@@ -1780,7 +1810,8 @@
 
     async function loadGamesFromFirestore() {
         try {
-            const snapshot = await db.collection('games').where('status', '==', 'active').get();
+            // পরিবর্তন ১: 'unavailable' গেমগুলোও লোড করা হচ্ছে
+            const snapshot = await db.collection('games').where('status', 'in', ['active', 'unavailable']).get();
             gamesFromDB = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             populateGameGrid();
         } catch (error) { console.error("Error fetching games: ", error); }
@@ -1804,7 +1835,6 @@
 
         const sortedCategories = Object.keys(groupedGames).sort((a, b) => {
             const getRank = (cat) => {
-                // 'Event' category should always be first
                 if (cat === 'Event') return -1;
                 const games = groupedGames[cat];
                 const rank = games[0].categoryRank !== undefined ? parseInt(games[0].categoryRank) : 999;
@@ -1813,14 +1843,12 @@
             return getRank(a) - getRank(b);
         });
 
-        // সর্বোচ্চ ১০টি ক্যাটাগরি (Event বাদে)
         const topTenCategories = sortedCategories.filter(c => c !== 'Event').slice(0, 10);
         if (sortedCategories.includes('Event')) {
              topTenCategories.unshift('Event');
         }
 
         topTenCategories.forEach(category => {
-            // প্রতিটি ক্যাটাগরির গেমগুলোকে তাদের র‍্যাঙ্ক অনুযায়ী সাজানো
             const sortedGames = groupedGames[category].sort((a, b) => (a.rank || 999) - (b.rank || 999));
             
             const gridDiv = document.createElement('div');
@@ -1830,20 +1858,31 @@
                 const card = document.createElement('div');
                 card.className = 'game-card';
                 
-                const badgeHtml = game.badgeText 
-                    ? `<span class="card-badge">${game.badgeText}</span>` 
-                    : '';
+                const badgeHtml = game.badgeText ? `<span class="card-badge">${game.badgeText}</span>` : '';
+                
+                // পরিবর্তন ১: আন এভেইলেবল ওভারলে যুক্ত করা
+                const unavailableOverlay = `
+                    <div class="unavailable-overlay" style="display: none;">
+                        <img src="https://i.ibb.co/p3L111z/1000020217-removebg-preview.png" alt="Unavailable">
+                    </div>`;
 
-                card.innerHTML = `${badgeHtml}
+                card.innerHTML = `${unavailableOverlay} ${badgeHtml}
                                   <div class="icon-wrapper"><img src="${game.logo}" alt="${game.name}"></div>
                                   <div class="game-info-container">
                                       <div class="game-name">${game.name}</div>
                                   </div>`;
-                card.onclick = () => selectGame(game);
+
+                // পরিবর্তন ১: স্ট্যাটাস চেক করে ক্লিক ইভেন্ট দেওয়া
+                if (game.status === 'unavailable') {
+                    card.classList.add('disabled');
+                    card.querySelector('.unavailable-overlay').style.display = 'flex';
+                } else {
+                    card.onclick = () => selectGame(game);
+                }
+                
                 gridDiv.appendChild(card);
             });
             
-            // 'Event' ক্যাটাগরির জন্য বিশেষ লেআউট
             if (category === 'Event') {
                  eventContainer.innerHTML = `
                     <div class="event-section-wrapper">
@@ -1851,9 +1890,7 @@
                             <h2 class="event-header-title" id="eventHeaderTitle">Event</h2>
                             <div class="event-timer" id="eventCountdown">00:00:00</div>
                         </div>
-                        <div class="event-content-box">
-                           <!-- game grid will be appended here -->
-                        </div>
+                        <div class="event-content-box"></div>
                     </div>
                  `;
                  eventContainer.querySelector('.event-content-box').appendChild(gridDiv);
@@ -1878,12 +1915,19 @@
         const inputField = document.getElementById('playerId');
         const inputType = game.inputType || 'userid';
         
+        // পরিবর্তন ২: ইনপুট টাইপ অনুযায়ী লেবেল পরিবর্তন
         if (inputType === 'email') {
              inputLabel.innerHTML = '<span class="step-number">1</span>আপনার ইমেইল দিন';
              inputField.placeholder = 'এখানে ইমেইল লিখুন';
+             inputField.type = 'email';
+        } else if (inputType === 'mobile_number') {
+             inputLabel.innerHTML = '<span class="step-number">1</span>আপনার মোবাইল নম্বর দিন';
+             inputField.placeholder = 'এখানে মোবাইল নম্বর লিখুন';
+             inputField.type = 'tel';
         } else {
              inputLabel.innerHTML = '<span class="step-number">1</span>আপনার প্লেয়ার আইডি দিন';
              inputField.placeholder = 'এখানে প্লেয়ার আইডি লিখুন';
+             inputField.type = 'text';
         }
 
         const descContainer = document.getElementById('gameDescriptionContainer');
@@ -2225,11 +2269,11 @@
         });
     }
 
-    // নতুন সংযোজন: ইভেন্ট টাইমার ফাংশন
     function initializeEventListener() {
         db.collection('settings').doc('event').onSnapshot(doc => {
-            const eventContainer = document.querySelector('.event-section-wrapper');
-            if (eventContainer && doc.exists && doc.data().isActive) {
+            const eventWrapper = document.querySelector('.event-section-wrapper');
+            if (eventWrapper && doc.exists && doc.data().isActive) {
+                eventWrapper.style.display = 'block'; // ইভেন্ট থাকলে সেকশন দেখান
                 const eventData = doc.data();
                 const titleEl = document.getElementById('eventHeaderTitle');
                 const timerEl = document.getElementById('eventCountdown');
@@ -2260,9 +2304,9 @@
                     timerEl.innerHTML = (days > 0 ? `${f(days)}d ` : '') + `${f(hours)}:${f(minutes)}:${f(seconds)}`;
                 }, 1000);
 
-            } else if (eventContainer) {
+            } else if (eventWrapper) {
                  if (eventTimerInterval) clearInterval(eventTimerInterval);
-                 eventContainer.style.display = 'none'; // ইভেন্ট না থাকলে সেকশনটি হাইড করুন
+                 eventWrapper.style.display = 'none';
             }
         });
     }
@@ -2282,6 +2326,22 @@
             }
         } catch(e) {
             console.error("Error loading terms and conditions: ", e);
+        }
+    }
+
+    // সংযোজন ৩: কপিরাইট ফুটার ফাংশন
+    async function loadCopyrightFooter() {
+        try {
+            const doc = await db.collection('settings').doc('branding').get();
+            let appName = 'Your Shop'; // Default name
+            if (doc.exists && doc.data().appName) {
+                appName = doc.data().appName;
+            }
+            const currentYear = new Date().getFullYear();
+            document.getElementById('copyright-footer').textContent = `© ${currentYear} ${appName}. All Rights Reserved.`;
+        } catch (error) {
+            console.error("Error loading copyright:", error);
+            document.getElementById('copyright-footer').textContent = `© ${new Date().getFullYear()} Your Shop.`;
         }
     }
 
