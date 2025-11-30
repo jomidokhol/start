@@ -636,8 +636,9 @@
     
     .event-section-wrapper {
         position: relative;
-        padding-top: 25px; /* MODIFIED: Reduced padding as title is outside */
+        padding-top: 0px; /* MODIFIED: Removed padding so border starts at top */
         margin-bottom: 30px;
+        margin-top: 25px; /* Added margin to maintain spacing with title */
     }
     .event-content-box {
         border: 2px solid var(--primary-purple);
@@ -657,7 +658,7 @@
 
     .event-header-tab {
         position: absolute;
-        top: -15px; /* MODIFIED: Adjusted position */
+        top: -18px; /* MODIFIED: Adjusted position to sit exactly on the border */
         left: 50%;
         transform: translateX(-50%);
         background-color: var(--background-color);
@@ -2308,7 +2309,9 @@
 
                     if (distance < 0) {
                         clearInterval(eventTimerInterval);
-                        timerEl.innerHTML = "EXPIRED";
+                        /* MODIFIED: Remove "End in" and show only EXPIRED */
+                        timerEl.parentElement.innerHTML = "EXPIRED";
+                        
                         /* MODIFIED: Event Expiration Logic */
                         const eventCards = document.querySelectorAll('#eventSectionContainer .game-card');
                         eventCards.forEach(card => {
