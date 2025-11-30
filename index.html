@@ -683,24 +683,13 @@
     body.dark-mode .event-header-tab { background-color: var(--background-color); }
     body.dark-mode .event-timer { background-color: #2C2C2E; }
 
-    /* সংযোজন ৩: কপিরাইট ফুটার স্টাইল */
+    /* সংযোজন ৩: কপিরাইট ফুটার স্টাইল (সংশোধিত) */
     #copyright-footer {
-        position: fixed;
-        bottom: 80px; /* নেভিগেশন বারের উপরে */
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%;
-        max-width: 480px;
-        background-color: var(--background-color);
-        color: var(--secondary-text-color);
         text-align: center;
-        padding: 8px 0;
+        padding: 20px 0;
+        color: var(--secondary-text-color);
         font-size: 12px;
-        z-index: 999;
-        border-top: 1px solid rgba(0,0,0,0.05);
-    }
-    body.dark-mode #copyright-footer {
-        border-color: rgba(255,255,255,0.08);
+        margin-top: 20px;
     }
 </style>
 </head>
@@ -801,6 +790,9 @@
             <h3 id="termsTitle"></h3>
             <p id="termsText"></p>
         </div>
+
+        <!-- সংযোজন ৩: কপিরাইট ফুটার HTML (Moved Inside Home Screen for scrolling) -->
+        <footer id="copyright-footer"></footer>
     </div>
 
     
@@ -922,9 +914,6 @@
         <header class="page-header"><i class="fa-solid fa-arrow-left back-btn" onclick="showScreen('walletScreen', document.querySelectorAll('.nav-item')[1])"></i><h2>রিকোয়েস্ট পাঠানো হয়েছে</h2></header>
         <div id="moneyRequestSuccessContainer"></div>
     </div>
-    
-    <!-- সংযোজন ৩: কপিরাইট ফুটার HTML -->
-    <footer id="copyright-footer"></footer>
     
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="showScreen('homeScreen', this)"> <i class="fa-solid fa-house"></i> <span>হোম</span> </div>
@@ -1860,10 +1849,10 @@
                 
                 const badgeHtml = game.badgeText ? `<span class="card-badge">${game.badgeText}</span>` : '';
                 
-                // পরিবর্তন ১: আন এভেইলেবল ওভারলে যুক্ত করা
+                // পরিবর্তন ২: আন এভেইলেবল স্ট্যাটাসের জন্য নতুন ইমেজ লিঙ্ক
                 const unavailableOverlay = `
                     <div class="unavailable-overlay" style="display: none;">
-                        <img src="https://i.ibb.co/p3L111z/1000020217-removebg-preview.png" alt="Unavailable">
+                        <img src="https://i.postimg.cc/66S03X9x/1000020217-removebg-preview.png" alt="Unavailable">
                     </div>`;
 
                 card.innerHTML = `${unavailableOverlay} ${badgeHtml}
