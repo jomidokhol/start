@@ -251,6 +251,7 @@
         justify-content: center;
         align-items: center;
         z-index: 10;
+        display: none; /* By default hidden, shown via JS or CSS if disabled */
     }
     body.dark-mode .unavailable-overlay {
         background-color: rgba(28, 28, 30, 0.7);
@@ -262,6 +263,10 @@
     .game-card.disabled {
         cursor: not-allowed;
         opacity: 0.7;
+        pointer-events: none; /* Make unclickable */
+    }
+    .game-card.disabled .unavailable-overlay {
+        display: flex; /* Show overlay when disabled */
     }
     
     
@@ -631,7 +636,7 @@
     
     .event-section-wrapper {
         position: relative;
-        padding-top: 30px;
+        padding-top: 25px; /* MODIFIED: Reduced padding as title is outside */
         margin-bottom: 30px;
     }
     .event-content-box {
@@ -652,7 +657,7 @@
 
     .event-header-tab {
         position: absolute;
-        top: 0;
+        top: -15px; /* MODIFIED: Adjusted position */
         left: 50%;
         transform: translateX(-50%);
         background-color: var(--background-color);
@@ -662,23 +667,22 @@
         align-items: center;
         gap: 8px;
     }
-    .event-header-title {
-        font-weight: 700;
-        font-size: 18px;
-        color: var(--primary-text-color);
-        margin: 0;
-    }
+    
+    /* MODIFIED: Timer styling */
     .event-timer {
         background-color: #1D1D1F;
         color: var(--accent-green);
         font-family: 'Courier New', Courier, monospace;
         padding: 6px 15px;
         border-radius: 20px;
-        font-size: 16px;
+        font-size: 14px; /* Slightly adjusted size */
         font-weight: 700;
-        letter-spacing: 2px;
+        letter-spacing: 1px;
         border: 2px solid var(--card-bg-color);
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        gap: 5px;
     }
     body.dark-mode .event-header-tab { background-color: var(--background-color); }
     body.dark-mode .event-timer { background-color: #2C2C2E; }
@@ -1040,7 +1044,7 @@
     
     function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(() => {
-            alert('নম্বর কপি করা হয়েছে: ' + text);
+            alert('কপি করা হয়েছে: ' + text);
         }).catch(err => {
             console.error('Copy failed', err);
         });
@@ -1621,6 +1625,20 @@
                         </div>`;
                 }
 
+                /* MODIFIED: Add UNIPIN Code display */
+                let adminMessageHtml = '';
+                if (order.adminNote || order.voucherCode) { // Assuming field is adminNote or voucherCode
+                    const code = order.adminNote || order.voucherCode;
+                     adminMessageHtml = `
+                    <div style="background: rgba(52, 199, 89, 0.1); padding: 10px; border-radius: 8px; margin-top: 8px; border: 1px solid #34C759;">
+                        <p style="font-size: 13px; font-weight: 700; color: #34C759; margin-bottom: 5px;">UNIPIN Code-</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-family: monospace; font-size: 14px; color: var(--primary-text-color);">${code}</span>
+                            <i class="fa-regular fa-copy copy-btn" onclick="copyToClipboard('${code}')"></i>
+                        </div>
+                    </div>`;
+                }
+
                 historyHtml += `<div class="topup-section">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
                         <span>গেম: <strong>${order.game}</strong></span>
@@ -1630,6 +1648,7 @@
                     <p style="display:flex; justify-content:space-between; margin-bottom: 8px;"><span>প্লেয়ার আইডি:</span><strong>${order.playerId}</strong></p>
                      <p style="display:flex; justify-content:space-between; margin-bottom: 8px;"><span>ট্রানজেকশন আইডি:</span><strong>${order.transactionId || 'N/A'}</strong></p>
                     <p style="display:flex; justify-content:space-between;"><span>তারিখ:</span><strong>${orderDate.toLocaleString('bn-BD')}</strong></p>
+                    ${adminMessageHtml}
                     ${buttons}
                 </div>`;
             });
@@ -1855,7 +1874,7 @@
                 
                 
                 const unavailableOverlay = `
-                    <div class="unavailable-overlay" style="display: none;">
+                    <div class="unavailable-overlay">
                         <img src="https://i.postimg.cc/66S03X9x/1000020217-removebg-preview.png" alt="Unavailable">
                     </div>`;
 
@@ -1868,7 +1887,7 @@
                 
                 if (game.status === 'unavailable') {
                     card.classList.add('disabled');
-                    card.querySelector('.unavailable-overlay').style.display = 'flex';
+                    // Removed manual style.display = flex, handled by CSS .game-card.disabled .unavailable-overlay
                 } else {
                     card.onclick = () => selectGame(game);
                 }
@@ -1877,11 +1896,12 @@
             });
             
             if (category === 'Event') {
+                 /* MODIFIED: Event HTML Structure - Title outside, Timer modified */
                  eventContainer.innerHTML = `
+                    <h2 class="section-title" id="eventHeaderTitle">Event</h2>
                     <div class="event-section-wrapper">
                         <div class="event-header-tab">
-                            <h2 class="event-header-title" id="eventHeaderTitle">Event</h2>
-                            <div class="event-timer" id="eventCountdown">00:00:00</div>
+                            <div class="event-timer">End in <span id="eventCountdown">00:00:00</span></div>
                         </div>
                         <div class="event-content-box"></div>
                     </div>
@@ -2266,8 +2286,12 @@
     function initializeEventListener() {
         db.collection('settings').doc('event').onSnapshot(doc => {
             const eventWrapper = document.querySelector('.event-section-wrapper');
+            const eventTitle = document.getElementById('eventHeaderTitle');
+
             if (eventWrapper && doc.exists && doc.data().isActive) {
                 eventWrapper.style.display = 'block'; 
+                if(eventTitle) eventTitle.style.display = 'block';
+
                 const eventData = doc.data();
                 const titleEl = document.getElementById('eventHeaderTitle');
                 const timerEl = document.getElementById('eventCountdown');
@@ -2278,13 +2302,19 @@
 
                 if (eventTimerInterval) clearInterval(eventTimerInterval);
 
-                eventTimerInterval = setInterval(() => {
+                const updateTimer = () => {
                     const now = new Date().getTime();
                     const distance = endTime - now;
 
                     if (distance < 0) {
                         clearInterval(eventTimerInterval);
                         timerEl.innerHTML = "EXPIRED";
+                        /* MODIFIED: Event Expiration Logic */
+                        const eventCards = document.querySelectorAll('#eventSectionContainer .game-card');
+                        eventCards.forEach(card => {
+                            card.classList.add('disabled');
+                            card.onclick = null; 
+                        });
                         return;
                     }
 
@@ -2296,11 +2326,15 @@
                     const f = (n) => n < 10 ? '0' + n : n;
 
                     timerEl.innerHTML = (days > 0 ? `${f(days)}d ` : '') + `${f(hours)}:${f(minutes)}:${f(seconds)}`;
-                }, 1000);
+                };
+
+                updateTimer(); // Run immediately
+                eventTimerInterval = setInterval(updateTimer, 1000);
 
             } else if (eventWrapper) {
                  if (eventTimerInterval) clearInterval(eventTimerInterval);
                  eventWrapper.style.display = 'none';
+                 if(eventTitle) eventTitle.style.display = 'none';
             }
         });
     }
