@@ -79,7 +79,7 @@
         overflow-x: hidden; 
         padding: 20px;
         padding-top: 0; 
-        padding-bottom: 200px; /* পরিবর্তন ২: বটম প্যাডিং বাড়ানো হয়েছে */
+        padding-bottom: 200px; 
         scrollbar-width: none; 
     }
     .screen::-webkit-scrollbar { display: none; } 
@@ -165,7 +165,7 @@
     .header .profile-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; cursor: pointer; border: 2px solid var(--card-bg-color); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .header-right-icons { display: flex; align-items: center; gap: 15px; }
     
-    /* সংযোজন ১: হেডার ওয়ালেট স্টাইল */
+    
     #headerWalletDisplay {
         display: none;
         align-items: center;
@@ -241,7 +241,7 @@
         position: relative; 
     }
     
-    /* পরিবর্তন ১: আন এভেইলেবল স্টাইল */
+    
     .unavailable-overlay {
         position: absolute;
         top: 0; left: 0;
@@ -628,7 +628,7 @@
         white-space: pre-wrap;
     }
     
-    /* সংযোজন ৪: ইভেন্ট সেকশন স্টাইল */
+    
     .event-section-wrapper {
         position: relative;
         padding-top: 30px;
@@ -640,10 +640,10 @@
         padding: 20px;
         padding-top: 45px;
         background: linear-gradient(45deg, var(--light-purple), transparent);
-        box-shadow: 0 0 15px 3px rgba(123, 97, 255, 0.5); /* গ্লো ইফেক্ট */
-        animation: pulse-glow 2.5s infinite alternate; /* গ্লো অ্যানিমেশন */
-        display: flex; /* একটি গেম থাকলে সেন্টারে দেখানোর জন্য */
-        justify-content: center; /* একটি গেম থাকলে সেন্টারে দেখানোর জন্য */
+        box-shadow: 0 0 15px 3px rgba(123, 97, 255, 0.5); 
+        animation: pulse-glow 2.5s infinite alternate; 
+        display: flex; 
+        justify-content: center; 
     }
     @keyframes pulse-glow {
         from { box-shadow: 0 0 15px 3px rgba(123, 97, 255, 0.4); }
@@ -683,7 +683,7 @@
     body.dark-mode .event-header-tab { background-color: var(--background-color); }
     body.dark-mode .event-timer { background-color: #2C2C2E; }
 
-    /* সংযোজন ৩: কপিরাইট ফুটার স্টাইল (সংশোধিত) */
+    
     #copyright-footer {
         text-align: center;
         padding: 20px 0;
@@ -760,7 +760,7 @@
                     <span id="onlineStatusText">Offline</span>
                 </div>
                 
-                <!-- সংযোজন ১: হেডার ওয়ালেট HTML -->
+                
                 <div id="headerWalletDisplay">
                     <i class="fa-solid fa-wallet"></i>
                     <span id="headerWalletBalance">৳ 0.00</span>
@@ -791,7 +791,7 @@
             <p id="termsText"></p>
         </div>
 
-        <!-- সংযোজন ৩: কপিরাইট ফুটার HTML (Moved Inside Home Screen for scrolling) -->
+        
         <footer id="copyright-footer"></footer>
     </div>
 
@@ -1084,7 +1084,7 @@
         initializePopupListener();
         initializeEventListener();
         loadTerms();
-        loadCopyrightFooter(); // সংযোজন ৩: ফুটার লোড
+        loadCopyrightFooter(); 
     });
     
     
@@ -1254,22 +1254,22 @@
         const profileScreenAvatar = document.getElementById('profileScreenAvatar');
         const headerProfileAvatar = document.getElementById('headerProfileAvatar');
         const headerGuestIcon = document.getElementById('headerGuestIcon');
-        const headerWalletDisplay = document.getElementById('headerWalletDisplay'); // সংযোজন ১
+        const headerWalletDisplay = document.getElementById('headerWalletDisplay'); 
 
         const avatarUrl = photoURL || "https://i.ibb.co/74CkxSP/avatar.png";
         profileScreenAvatar.src = avatarUrl;
 
-        if (name === "Guest User" || !currentUser) { // পরিবর্তন ১: currentUser চেক
+        if (name === "Guest User" || !currentUser) { 
             if(headerProfileAvatar) headerProfileAvatar.style.display = 'none';
             if(headerGuestIcon) headerGuestIcon.style.display = 'block';
-            if(headerWalletDisplay) headerWalletDisplay.style.display = 'none'; // সংযোজন ১
+            if(headerWalletDisplay) headerWalletDisplay.style.display = 'none'; 
         } else {
             if(headerProfileAvatar) {
                 headerProfileAvatar.src = avatarUrl;
                 headerProfileAvatar.style.display = 'block';
             }
             if(headerGuestIcon) headerGuestIcon.style.display = 'none';
-            if(headerWalletDisplay) headerWalletDisplay.style.display = 'flex'; // সংযোজন ১
+            if(headerWalletDisplay) headerWalletDisplay.style.display = 'flex'; 
         }
     }
     
@@ -1516,11 +1516,13 @@
                     const packageIndex = packages.findIndex(p => p.amount === selectedPackage.amount && p.price === selectedPackage.price);
                     if (packageIndex === -1) throw "এই প্যাকেজটি এখন আর পাওয়া যাচ্ছে না।";
                     
+                    // স্টক চেক লজিক (ওয়ালেট)
                     const currentStock = parseInt(packages[packageIndex].stock);
                     if (isNaN(currentStock) || currentStock < currentQuantity) {
                          throw "দুঃখিত! স্টকে পর্যাপ্ত পরিমাণ নেই।";
                     }
                     
+                    // স্টক আপডেট
                     packages[packageIndex].stock = currentStock - currentQuantity;
                     transaction.update(gameRef, { packages: packages });
 
@@ -1550,11 +1552,13 @@
                     const packageIndex = packages.findIndex(p => p.amount === selectedPackage.amount && p.price === selectedPackage.price);
                     if (packageIndex === -1) throw "এই প্যাকেজটি এখন আর পাওয়া যাচ্ছে না।";
 
+                    // স্টক চেক লজিক (ম্যানুয়াল পেমেন্ট)
                     const currentStock = parseInt(packages[packageIndex].stock);
                     if (isNaN(currentStock) || currentStock < currentQuantity) {
                          throw "দুঃখিত! স্টকে পর্যাপ্ত পরিমাণ নেই।";
                     }
                     
+                    // স্টক আপডেট
                     packages[packageIndex].stock = currentStock - currentQuantity;
                     transaction.update(gameRef, { packages: packages });
                     
@@ -1751,7 +1755,7 @@
     function updateWalletDisplay(balance) {
         const formattedBalance = `৳ ${parseFloat(balance || 0).toFixed(2)}`;
         document.getElementById('profileWalletBalance').innerText = formattedBalance;
-        document.getElementById('headerWalletBalance').innerText = formattedBalance; // সংযোজন ১
+        document.getElementById('headerWalletBalance').innerText = formattedBalance; 
     }
 
     function showOrderHistoryScreen(navElement) { showScreen('orderHistoryScreen', navElement); }
@@ -1799,7 +1803,7 @@
 
     async function loadGamesFromFirestore() {
         try {
-            // পরিবর্তন ১: 'unavailable' গেমগুলোও লোড করা হচ্ছে
+            
             const snapshot = await db.collection('games').where('status', 'in', ['active', 'unavailable']).get();
             gamesFromDB = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             populateGameGrid();
@@ -1849,7 +1853,7 @@
                 
                 const badgeHtml = game.badgeText ? `<span class="card-badge">${game.badgeText}</span>` : '';
                 
-                // পরিবর্তন ২: আন এভেইলেবল স্ট্যাটাসের জন্য নতুন ইমেজ লিঙ্ক
+                
                 const unavailableOverlay = `
                     <div class="unavailable-overlay" style="display: none;">
                         <img src="https://i.postimg.cc/66S03X9x/1000020217-removebg-preview.png" alt="Unavailable">
@@ -1861,7 +1865,7 @@
                                       <div class="game-name">${game.name}</div>
                                   </div>`;
 
-                // পরিবর্তন ১: স্ট্যাটাস চেক করে ক্লিক ইভেন্ট দেওয়া
+                
                 if (game.status === 'unavailable') {
                     card.classList.add('disabled');
                     card.querySelector('.unavailable-overlay').style.display = 'flex';
@@ -1904,7 +1908,7 @@
         const inputField = document.getElementById('playerId');
         const inputType = game.inputType || 'userid';
         
-        // পরিবর্তন ২: ইনপুট টাইপ অনুযায়ী লেবেল পরিবর্তন
+        
         if (inputType === 'email') {
              inputLabel.innerHTML = '<span class="step-number">1</span>আপনার ইমেইল দিন';
              inputField.placeholder = 'এখানে ইমেইল লিখুন';
@@ -1989,6 +1993,7 @@
 
         let newQuantity = currentQuantity + change;
         if (newQuantity < 1) newQuantity = 1;
+        
         
         const availableStock = parseInt(selectedPackage.stock);
         if (!isNaN(availableStock) && availableStock > 0 && newQuantity > availableStock) {
@@ -2262,7 +2267,7 @@
         db.collection('settings').doc('event').onSnapshot(doc => {
             const eventWrapper = document.querySelector('.event-section-wrapper');
             if (eventWrapper && doc.exists && doc.data().isActive) {
-                eventWrapper.style.display = 'block'; // ইভেন্ট থাকলে সেকশন দেখান
+                eventWrapper.style.display = 'block'; 
                 const eventData = doc.data();
                 const titleEl = document.getElementById('eventHeaderTitle');
                 const timerEl = document.getElementById('eventCountdown');
@@ -2318,11 +2323,11 @@
         }
     }
 
-    // সংযোজন ৩: কপিরাইট ফুটার ফাংশন
+    
     async function loadCopyrightFooter() {
         try {
             const doc = await db.collection('settings').doc('branding').get();
-            let appName = 'Your Shop'; // Default name
+            let appName = 'Your Shop'; 
             if (doc.exists && doc.data().appName) {
                 appName = doc.data().appName;
             }
